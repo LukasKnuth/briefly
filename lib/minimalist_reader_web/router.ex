@@ -19,9 +19,4 @@ defmodule MinimalistReaderWeb.Router do
 
     get "/", PageController, :home
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", MinimalistReaderWeb do
-  #   pipe_through :api
-  # end
 end
