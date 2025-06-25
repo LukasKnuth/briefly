@@ -41,7 +41,9 @@ defmodule MinimalistReader.MixProject do
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:bandit, "~> 1.2"}
+      {:bandit, "~> 1.2"},
+      {:saxy, "~> 1.6"},
+      {:timex, "~> 3.7"}
     ]
   end
 
