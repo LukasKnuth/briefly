@@ -2,7 +2,7 @@ defmodule MinimalistReader.FeedParserTest do
   use ExUnit.Case, async: true
 
   alias MinimalistReader.FeedParser
-  alias MinimalistReader.Models.{Feed, Item}
+  alias MinimalistReader.Models.Item
 
   @test_xml """
   <?xml version="1.0" encoding="UTF-8" ?>
@@ -32,10 +32,10 @@ defmodule MinimalistReader.FeedParserTest do
     test "parses RSS formatted feed" do
       res = @test_xml |> String.splitter("\n") |> FeedParser.parse_stream()
 
-      assert {:ok, %FeedParser{type: :rss, feed: feed, items: [item]}} = res
-      assert feed == %Feed{title: "RSS Title"}
+      assert {:ok, [item]} = res
 
       assert item == %Item{
+               feed: "RSS Title",
                title: "Example entry",
                link: "http://www.example.com/blog/post/1",
                pub_date: ~U[2009-09-06 16:20:00Z]

@@ -1,9 +1,9 @@
 defmodule MinimalistReader.FeedParser do
   @behaviour Saxy.Handler
 
-  alias MinimalistReader.Models.{Feed, Item}
+  alias MinimalistReader.Models.Item
 
-  defstruct type: nil, current: nil, feed: nil, items: []
+  defstruct type: nil, current: nil, feed_title: nil, items: []
 
   def parse_stream(stream) do
     Saxy.parse_stream(stream, __MODULE__, nil)
@@ -31,7 +31,7 @@ defmodule MinimalistReader.FeedParser do
   end
 
   def handle_event(:characters, chars, %__MODULE__{current: {:feed, :title}} = state) do
-    {:ok, %{state | current: nil, feed: %Feed{title: chars}}}
+    {:ok, %{state | current: nil, feed_title: String.trim(chars)}}
   end
 
   def handle_event(:start_element, {"item", _}, %__MODULE__{current: nil} = state) do
@@ -45,15 +45,15 @@ defmodule MinimalistReader.FeedParser do
 
   def handle_event(:characters, chars, %__MODULE__{current: {:item, element, map}} = state)
       when is_binary(element) do
-    {:ok, %{state | current: {:item, nil, Map.put(map, element, chars)}}}
+    {:ok, %{state | current: {:item, nil, Map.put(map, element, String.trim(chars))}}}
   end
 
   def handle_event(:end_element, "item", %__MODULE__{current: {:item, _, map}} = state) do
     with {:ok, title} <- Map.fetch(map, "title"),
          {:ok, link} <- Map.fetch(map, "link"),
          {:ok, published} <- Map.fetch(map, "pubDate"),
-         {:ok, pub_date} <- published |> String.trim() |> Timex.parse(@rss_datetime_fmt) do
-      item = %Item{title: String.trim(title), link: String.trim(link), pub_date: pub_date}
+         {:ok, pub_date} <- published |> Timex.parse(@rss_datetime_fmt) do
+      item = %Item{feed: state.feed_title, title: title, link: link, pub_date: pub_date}
       {:ok, %{state | current: nil, items: [item | state.items]}}
     else
       # Item didn't have required fields, ignore it
@@ -63,6 +63,11 @@ defmodule MinimalistReader.FeedParser do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  def handle_event(:end_document, _, %__MODULE__{items: items}) do
+    # Just return the items, not the complete state.
+    {:stop, items}
   end
 
   def handle_event(_ignored, _data, state), do: {:ok, state}
