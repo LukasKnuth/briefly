@@ -1,9 +1,9 @@
 defmodule MinimalistReader.FeedParser do
   @behaviour Saxy.Handler
 
-  alias MinimalistReader.Models.Item
+  alias MinimalistReader.FeedParser.RSS
 
-  defstruct type: nil, current: nil, feed_title: nil, items: []
+  defstruct mod: nil, current: nil, feed_title: nil, items: []
 
   def parse_stream(stream) do
     Saxy.parse_stream(stream, __MODULE__, nil)
@@ -11,58 +11,13 @@ defmodule MinimalistReader.FeedParser do
 
   def handle_event(:start_element, {"rss", _attr}, nil) do
     # TODO does RSS version matter?
-    {:ok, %__MODULE__{type: :rss}}
+    {:ok, %__MODULE__{mod: RSS}}
   end
 
   def handle_event(:start_element, {"atom", _attr}, nil) do
-    {:ok, %__MODULE__{type: :atom}}
-  end
-
-  # -------- RSS Parser ----------
-  @rss_item_elements ~w(title link pubDate)
-  @rss_datetime_fmt "{WDshort}, {D} {Mshort} {YYYY} {h24}:{0m}:{0s} {Z}"
-
-  def handle_event(:start_element, {"channel", _}, %__MODULE__{current: nil} = state) do
-    {:ok, %{state | current: {:feed, nil}}}
-  end
-
-  def handle_event(:start_element, {"title", _}, %__MODULE__{current: {:feed, nil}} = state) do
-    {:ok, %{state | current: {:feed, :title}}}
-  end
-
-  def handle_event(:characters, chars, %__MODULE__{current: {:feed, :title}} = state) do
-    {:ok, %{state | current: nil, feed_title: String.trim(chars)}}
-  end
-
-  def handle_event(:start_element, {"item", _}, %__MODULE__{current: nil} = state) do
-    {:ok, %{state | current: {:item, nil, %{}}}}
-  end
-
-  def handle_event(:start_element, {element, _}, %__MODULE__{current: {:item, _, map}} = state)
-      when element in @rss_item_elements do
-    {:ok, %{state | current: {:item, element, map}}}
-  end
-
-  def handle_event(:characters, chars, %__MODULE__{current: {:item, element, map}} = state)
-      when is_binary(element) do
-    {:ok, %{state | current: {:item, nil, Map.put(map, element, String.trim(chars))}}}
-  end
-
-  def handle_event(:end_element, "item", %__MODULE__{current: {:item, _, map}} = state) do
-    with {:ok, title} <- Map.fetch(map, "title"),
-         {:ok, link} <- Map.fetch(map, "link"),
-         {:ok, published} <- Map.fetch(map, "pubDate"),
-         {:ok, pub_date} <- published |> Timex.parse(@rss_datetime_fmt) do
-      item = %Item{feed: state.feed_title, title: title, link: link, pub_date: pub_date}
-      {:ok, %{state | current: nil, items: [item | state.items]}}
-    else
-      # Item didn't have required fields, ignore it
-      :error ->
-        {:ok, %{state | current: nil}}
-
-      {:error, reason} ->
-        {:error, reason}
-    end
+    # TODO
+    # {:ok, %__MODULE__{type: :atom}}
+    {:ok, nil}
   end
 
   def handle_event(:end_document, _, %__MODULE__{items: items}) do
@@ -70,5 +25,13 @@ defmodule MinimalistReader.FeedParser do
     {:stop, items}
   end
 
-  def handle_event(_ignored, _data, state), do: {:ok, state}
+  def handle_event(event, data, %__MODULE__{mod: module} = state) do
+    module.handle_event(event, data, state)
+  rescue
+    # No handler for this event, ignore.
+    _e in FunctionClauseError -> {:ok, state}
+  end
+
+  # Ingnores events _before_ we know which type of feed it is.
+  def handle_event(_event, _data, state), do: {:ok, state}
 end
