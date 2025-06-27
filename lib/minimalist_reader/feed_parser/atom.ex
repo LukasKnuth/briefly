@@ -1,45 +1,75 @@
 defmodule MinimalistReader.FeedParser.Atom do
+  @moduledoc """
+  Atom specific pull-parser implementation, used by `MinimalistReader.FeedParser`.
+
+  Implements a small subset of the Atom standard, as defined here:
+  https://validator.w3.org/feed/docs/atom.html
+  """
   alias MinimalistReader.FeedParser, as: State
   alias MinimalistReader.Models.Item
 
   @item_elements ~w(title published updated)
 
-  def handle_event(:start_element, {"title", _}, %State{current: {:feed, nil}} = state) do
-    {:ok, %{state | current: {:feed, :title}}}
+  def handle_event(
+        :start_element,
+        {"title", _},
+        %State{current_type: :feed, current_element: nil} = state
+      ) do
+    {:ok, %{state | current_element: "title"}}
   end
 
-  def handle_event(:characters, chars, %State{current: {:feed, :title}} = state) do
-    {:ok, %{state | current: nil, feed_title: String.trim(chars)}}
+  def handle_event(
+        :characters,
+        chars,
+        %State{current_type: :feed, current_element: "title"} = state
+      ) do
+    {:ok, %{state | current_element: nil, feed_title: String.trim(chars)}}
   end
 
-  def handle_event(:start_element, {"entry", _}, %State{current: nil} = state) do
-    {:ok, %{state | current: {:item, nil, %{}}}}
+  def handle_event(:start_element, {"entry", _}, %State{current_element: nil} = state) do
+    {:ok, %{state | current_type: :item, item_index: state.item_index + 1, partial: %{}}}
   end
 
-  def handle_event(:start_element, {"link", attributes}, %State{current: {:item, _, map}} = state) do
+  def handle_event(
+        :start_element,
+        {"link", attributes},
+        %State{current_type: :item, current_element: nil, partial: map} = state
+      ) do
     case fetch_attribute(attributes, "href") do
       nil ->
         # No link information available, don't set value
-        {:ok, state}
+        {:ok, %{state | problems: [{state.item_index, :malformed_link} | state.problems]}}
 
       link when is_binary(link) ->
         entry = {link, fetch_attribute(attributes, "rel")}
         map = Map.update(map, "link", [entry], &[entry | &1])
-        {:ok, %{state | current: {:item, nil, map}}}
+        {:ok, %{state | partial: map}}
     end
   end
 
-  def handle_event(:start_element, {element, _}, %State{current: {:item, _, map}} = state)
+  def handle_event(
+        :start_element,
+        {element, _},
+        %State{current_type: :item, current_element: nil} = state
+      )
       when element in @item_elements do
-    {:ok, %{state | current: {:item, element, map}}}
+    {:ok, %{state | current_element: element}}
   end
 
-  def handle_event(:characters, chars, %State{current: {:item, element, map}} = state)
+  def handle_event(
+        :characters,
+        chars,
+        %State{current_type: :item, current_element: element, partial: map} = state
+      )
       when is_binary(element) do
-    {:ok, %{state | current: {:item, nil, Map.put(map, element, String.trim(chars))}}}
+    {:ok, %{state | current_element: nil, partial: Map.put(map, element, String.trim(chars))}}
   end
 
-  def handle_event(:end_element, "entry", %State{current: {:item, _, map}} = state) do
+  def handle_event(
+        :end_element,
+        "entry",
+        %State{current_type: :item, current_element: nil, partial: map} = state
+      ) do
     with {:ok, title} <- Map.fetch(map, "title"),
          {:ok, link_list} <- Map.fetch(map, "link"),
          {:ok, link} <- pick_link(link_list),
@@ -52,14 +82,14 @@ defmodule MinimalistReader.FeedParser.Atom do
         date: date
       }
 
-      {:ok, %{state | current: nil, items: [item | state.items]}}
+      {:ok, %{state | items: [item | state.items]}}
     else
       # Item didn't have required fields, ignore it
       :error ->
-        {:ok, %{state | current: nil}}
+        {:ok, %{state | problems: [{state.item_index, :missing_fields} | state.problems]}}
 
       {:error, reason} ->
-        {:error, reason}
+        {:ok, %{state | problems: [{state.item_index, {:date, reason}} | state.problems]}}
     end
   end
 

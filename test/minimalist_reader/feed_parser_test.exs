@@ -30,7 +30,7 @@ defmodule MinimalistReader.FeedParserTest do
     test "parses RSS formatted feed" do
       res = @test_rss |> String.splitter("\n") |> FeedParser.parse_stream()
 
-      assert {:ok, [item]} = res
+      assert {:ok, [item], []} = res
 
       assert item == %Item{
                feed: "RSS Title",
@@ -45,7 +45,7 @@ defmodule MinimalistReader.FeedParserTest do
     test "parses valid sample feed" do
       res = FeedParser.parse_stream(load_fixture!("atom/valid_small.xml"))
 
-      assert {:ok, [item]} = res
+      assert {:ok, [item], []} = res
 
       assert item == %Item{
                feed: "Example Feed",
@@ -58,23 +58,19 @@ defmodule MinimalistReader.FeedParserTest do
     test "errors if entry has malformed date" do
       res = FeedParser.parse_stream(load_fixture!("atom/malformed_date.xml"))
 
-      assert {:error,
-              %Saxy.ParseError{reason: {:bad_return, {:end_element, {:error, :invalid_format}}}}} =
-               res
+      assert {:ok, [], [{0, {:date, :invalid_format}}]} = res
     end
 
     test "errors if entry has malformed link" do
       res = FeedParser.parse_stream(load_fixture!("atom/malformed_link.xml"))
 
-      assert {:error,
-              %Saxy.ParseError{reason: {:bad_return, {:end_element, {:error, :invalid_format}}}}} =
-               res
+      assert {:ok, [], [{0, :malformed_link}, {0, :missing_fields}]} = res
     end
 
     test "falls back to `updated` if item has no `published` date" do
       res = FeedParser.parse_stream(load_fixture!("atom/fallback_entries.xml"))
 
-      assert {:ok, [item, _]} = res
+      assert {:ok, [item, _], []} = res
 
       assert item == %Item{
                feed: "Fixture",
@@ -87,7 +83,7 @@ defmodule MinimalistReader.FeedParserTest do
     test "falls back to `rel=alternate` link if non without `rel` are present" do
       res = FeedParser.parse_stream(load_fixture!("atom/fallback_entries.xml"))
 
-      assert {:ok, [_, item]} = res
+      assert {:ok, [_, item], []} = res
 
       assert item == %Item{
                feed: "Fixture",
@@ -100,7 +96,8 @@ defmodule MinimalistReader.FeedParserTest do
     test "skips entries missing required fields" do
       res = FeedParser.parse_stream(load_fixture!("atom/incomplete_entries.xml"))
 
-      assert {:ok, []} = res
+      assert {:ok, [], problems} = res
+      for problem <- problems, do: assert({_idx, :missing_fields} = problem)
     end
   end
 
