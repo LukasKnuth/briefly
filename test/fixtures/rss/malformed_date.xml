@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Fixture</title>
+    <item>
+      <guid isPermaLink="false">7bd204c6-1655-4c27-aeee-53f933c5395f</guid>
+      <title>Malformed Date</title>
+      <link>http://www.example.com/blog/post/1</link>
+      <pubDate>2012-10-21T19:18:77Z</pubDate>
+    </item>
+  </channel>
+</rss>

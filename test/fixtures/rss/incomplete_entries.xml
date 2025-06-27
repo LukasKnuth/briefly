@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Fixture</title>
+    <item>
+      <!-- Missing Title -->
+      <guid isPermaLink="false">7bd204c6-1655-4c27-aeee-53f933c5395f</guid>
+      <link>http://www.example.com/blog/post/1</link>
+      <pubDate>Sun, 6 Sep 2009 16:20:00 +0000</pubDate>
+    </item>
+    <item>
+      <guid isPermaLink="false">7bd204c6-1655-4c27-aeee-53f933c5395f</guid>
+      <title>Missing Link</title>
+      <pubDate>Sun, 6 Sep 2009 16:20:00 +0000</pubDate>
+    </item>
+    <item>
+      <guid isPermaLink="false">7bd204c6-1655-4c27-aeee-53f933c5395f</guid>
+      <title>Missing date</title>
+      <link>http://www.example.com/blog/post/1</link>
+    </item>
+  </channel>
+</rss>
