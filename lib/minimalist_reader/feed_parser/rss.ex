@@ -9,7 +9,6 @@ defmodule MinimalistReader.FeedParser.RSS do
   alias MinimalistReader.Models.Item
 
   @item_elements ~w(title link pubDate)
-  @datetime_fmt "{WDshort}, {D} {Mshort} {YYYY} {h24}:{0m}:{0s} {Z}"
 
   def handle_event(:start_element, {"channel", _}, %State{current_type: nil} = state) do
     {:ok, %{state | current_type: :feed, current_element: nil}}
@@ -61,7 +60,7 @@ defmodule MinimalistReader.FeedParser.RSS do
     with {:ok, title} <- Map.fetch(map, "title"),
          {:ok, link} <- Map.fetch(map, "link"),
          {:ok, published} <- Map.fetch(map, "pubDate"),
-         {:ok, date} <- published |> Timex.parse(@datetime_fmt) do
+         {:ok, date} <- published |> Timex.parse("{RFC1123}") do
       item = %Item{feed: state.feed_title, title: title, link: link, date: date}
       {:ok, %{state | items: [item | state.items]}}
     else
