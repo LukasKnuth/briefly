@@ -3,5 +3,5 @@ defmodule MinimalistReader.Models.Item do
   A Feed Item, extracted from a Feed.
   """
 
-  defstruct feed: nil, title: nil, link: nil, pub_date: nil
+  defstruct feed: nil, title: nil, link: nil, date: nil
 end

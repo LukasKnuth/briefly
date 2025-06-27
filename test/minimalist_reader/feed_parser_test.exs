@@ -67,7 +67,7 @@ defmodule MinimalistReader.FeedParserTest do
                feed: "RSS Title",
                title: "Example entry",
                link: "http://www.example.com/blog/post/1",
-               pub_date: ~U[2009-09-06 16:20:00Z]
+               date: ~U[2009-09-06 16:20:00Z]
              }
     end
 
@@ -80,7 +80,7 @@ defmodule MinimalistReader.FeedParserTest do
                feed: "Example Feed",
                title: "Atom-Powered Robots Run Amok",
                link: "http://example.org/2003/12/13/atom03.html",
-               pub_date: ~U[2003-11-09 17:23:02Z]
+               date: ~U[2003-11-09 17:23:02Z]
              }
     end
   end

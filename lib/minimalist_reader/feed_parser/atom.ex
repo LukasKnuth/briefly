@@ -2,7 +2,7 @@ defmodule MinimalistReader.FeedParser.Atom do
   alias MinimalistReader.FeedParser, as: State
   alias MinimalistReader.Models.Item
 
-  @item_elements ~w(title published)
+  @item_elements ~w(title published updated)
 
   def handle_event(:start_element, {"title", _}, %State{current: {:feed, nil}} = state) do
     {:ok, %{state | current: {:feed, :title}}}
@@ -43,13 +43,13 @@ defmodule MinimalistReader.FeedParser.Atom do
     with {:ok, title} <- Map.fetch(map, "title"),
          {:ok, link_list} <- Map.fetch(map, "link"),
          {:ok, link} <- pick_link(link_list),
-         {:ok, published} <- Map.fetch(map, "published"),
-         {:ok, pub_date, _} <- DateTime.from_iso8601(published) do
+         {:ok, date} <- pick_date(map),
+         {:ok, date, _} <- DateTime.from_iso8601(date) do
       item = %Item{
         feed: state.feed_title,
         title: title,
         link: link,
-        pub_date: pub_date
+        date: date
       }
 
       {:ok, %{state | current: nil, items: [item | state.items]}}
@@ -71,6 +71,10 @@ defmodule MinimalistReader.FeedParser.Atom do
       if name == to_fetch, do: val, else: false
     end)
   end
+
+  defp pick_date(%{"published" => date}), do: {:ok, date}
+  defp pick_date(%{"updated" => date}), do: {:ok, date}
+  defp pick_date(_), do: :error
 
   defp pick_link([{link, _rel}]), do: {:ok, link}
 

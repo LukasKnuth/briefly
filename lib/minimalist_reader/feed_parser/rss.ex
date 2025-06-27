@@ -35,8 +35,8 @@ defmodule MinimalistReader.FeedParser.RSS do
     with {:ok, title} <- Map.fetch(map, "title"),
          {:ok, link} <- Map.fetch(map, "link"),
          {:ok, published} <- Map.fetch(map, "pubDate"),
-         {:ok, pub_date} <- published |> Timex.parse(@datetime_fmt) do
-      item = %Item{feed: state.feed_title, title: title, link: link, pub_date: pub_date}
+         {:ok, date} <- published |> Timex.parse(@datetime_fmt) do
+      item = %Item{feed: state.feed_title, title: title, link: link, date: date}
       {:ok, %{state | current: nil, items: [item | state.items]}}
     else
       # Item didn't have required fields, ignore it
