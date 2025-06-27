@@ -9,7 +9,12 @@ defmodule MinimalistReader.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -32,18 +37,24 @@ defmodule MinimalistReader.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # Web Framework
       {:phoenix, "~> 1.7.11"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.20.2"},
-      {:floki, ">= 0.30.0", only: :test},
-      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
-      {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.2"},
+      {:gettext, "~> 0.20"},
+      # LiveView
+      {:phoenix_live_view, "~> 0.20.2"},
+      {:floki, ">= 0.30.0", only: :test},
+      # Assets
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+      # RSS parsing
       {:saxy, "~> 1.6"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      # Test coverage
+      {:excoveralls, "~> 0.18.5", only: :test}
     ]
   end
 
