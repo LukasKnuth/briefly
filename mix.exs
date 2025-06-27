@@ -56,7 +56,9 @@ defmodule MinimalistReader.MixProject do
       # Test coverage
       {:excoveralls, "~> 0.18.5", only: :test},
       # Web requests
-      {:req, "~> 0.5.12"}
+      {:req, "~> 0.5.12"},
+      # Config file format
+      {:yaml_elixir, "~> 2.11"}
     ]
   end
 

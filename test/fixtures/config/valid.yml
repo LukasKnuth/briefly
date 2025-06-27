@@ -1,0 +1,7 @@
+feeds:
+  - https://lknuth.dev/writings/index.xml
+  - url: https://feeds.bbci.co.uk/news/world/europe/rss.xml
+    group: News
+  - https://example.com/madeup/rss
+  - url: https://www.theverge.com/rss/index.xml
+    group: News
