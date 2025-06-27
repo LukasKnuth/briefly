@@ -26,38 +26,7 @@ defmodule MinimalistReader.FeedParserTest do
   </rss>
   """
 
-  @test_atom """
-  <?xml version="1.0" encoding="utf-8"?>
-  <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Example Feed</title>
-  <subtitle>A subtitle.</subtitle>
-  <link href="http://example.org/feed/" rel="self" />
-  <link href="http://example.org/" />
-  <id>urn:uuid:60a76c80-d399-11d9-b91C-0003939e0af6</id>
-  <updated>2003-12-13T18:30:02Z</updated>
-  <entry>
-  <title>Atom-Powered Robots Run Amok</title>
-  <link href="http://example.org/2003/12/13/atom03" />
-  <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>
-  <link rel="edit" href="http://example.org/2003/12/13/atom03/edit"/>
-  <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
-  <published>2003-11-09T17:23:02Z</published>
-  <updated>2003-12-13T18:30:02Z</updated>
-  <summary>Some text.</summary>
-  <content type="xhtml">
-  	<div xmlns="http://www.w3.org/1999/xhtml">
-  		<p>This is the entry content.</p>
-  	</div>
-  </content>
-  <author>
-  	<name>John Doe</name>
-  	<email>johndoe@example.com</email>
-  </author>
-  </entry>
-  </feed>
-  """
-
-  describe "parse_stream/1" do
+  describe "parse_stream/1 for RSS" do
     test "parses RSS formatted feed" do
       res = @test_rss |> String.splitter("\n") |> FeedParser.parse_stream()
 
@@ -70,9 +39,11 @@ defmodule MinimalistReader.FeedParserTest do
                date: ~U[2009-09-06 16:20:00Z]
              }
     end
+  end
 
-    test "parses Atom formatted feed" do
-      res = @test_atom |> String.splitter("\n") |> FeedParser.parse_stream()
+  describe "parse_stream/1 for Atom" do
+    test "parses valid sample feed" do
+      res = FeedParser.parse_stream(load_fixture!("atom/valid_small.xml"))
 
       assert {:ok, [item]} = res
 
@@ -83,5 +54,57 @@ defmodule MinimalistReader.FeedParserTest do
                date: ~U[2003-11-09 17:23:02Z]
              }
     end
+
+    test "errors if entry has malformed date" do
+      res = FeedParser.parse_stream(load_fixture!("atom/malformed_date.xml"))
+
+      assert {:error,
+              %Saxy.ParseError{reason: {:bad_return, {:end_element, {:error, :invalid_format}}}}} =
+               res
+    end
+
+    test "errors if entry has malformed link" do
+      res = FeedParser.parse_stream(load_fixture!("atom/malformed_link.xml"))
+
+      assert {:error,
+              %Saxy.ParseError{reason: {:bad_return, {:end_element, {:error, :invalid_format}}}}} =
+               res
+    end
+
+    test "falls back to `updated` if item has no `published` date" do
+      res = FeedParser.parse_stream(load_fixture!("atom/fallback_entries.xml"))
+
+      assert {:ok, [item, _]} = res
+
+      assert item == %Item{
+               feed: "Fixture",
+               title: "Only updated",
+               link: "http://example.org/2003/12/13/atom03",
+               date: ~U[2013-12-19 15:13:42Z]
+             }
+    end
+
+    test "falls back to `rel=alternate` link if non without `rel` are present" do
+      res = FeedParser.parse_stream(load_fixture!("atom/fallback_entries.xml"))
+
+      assert {:ok, [_, item]} = res
+
+      assert item == %Item{
+               feed: "Fixture",
+               title: "Multiple Links",
+               link: "http://example.org/2003/12/13/atom03.html",
+               date: ~U[2003-11-09 17:23:02Z]
+             }
+    end
+
+    test "skips entries missing required fields" do
+      res = FeedParser.parse_stream(load_fixture!("atom/incomplete_entries.xml"))
+
+      assert {:ok, []} = res
+    end
+  end
+
+  defp load_fixture!(path) do
+    File.stream!(Path.join("test/fixtures", path))
   end
 end

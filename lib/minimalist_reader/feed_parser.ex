@@ -21,13 +21,13 @@ defmodule MinimalistReader.FeedParser do
 
   def handle_event(:end_document, _, %__MODULE__{items: items}) do
     # Just return the items, not the complete state.
-    {:stop, items}
+    {:stop, Enum.reverse(items)}
   end
 
   def handle_event(event, data, %__MODULE__{mod: module} = state) do
     module.handle_event(event, data, state)
   end
 
-  # Ingnores events _before_ we know which type of feed it is.
+  # NOTE: Ingnore events _before_ we know which type of feed it is.
   def handle_event(_event, _data, state), do: {:ok, state}
 end
