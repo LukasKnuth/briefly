@@ -50,11 +50,13 @@ defmodule MinimalistReader.MixProject do
       # Assets
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
-      # RSS parsing
+      # Feed parsing
       {:saxy, "~> 1.6"},
       {:timex, "~> 3.7"},
       # Test coverage
-      {:excoveralls, "~> 0.18.5", only: :test}
+      {:excoveralls, "~> 0.18.5", only: :test},
+      # Web requests
+      {:req, "~> 0.5.12"}
     ]
   end
 

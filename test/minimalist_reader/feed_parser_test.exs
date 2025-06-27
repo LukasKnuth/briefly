@@ -5,6 +5,14 @@ defmodule MinimalistReader.FeedParserTest do
   alias MinimalistReader.Models.Item
 
   describe "parse_stream/1 for RSS" do
+    test "INTEGRATION live feed" do
+      resp = Req.get!("https://feeds.bbci.co.uk/news/world/europe/rss.xml", into: :self)
+      res = FeedParser.parse_stream(resp.body)
+
+      assert {:ok, results, []} = res
+      assert length(results) > 0
+    end
+
     test "parses RSS formatted feed" do
       res = FeedParser.parse_stream(load_fixture!("rss/valid_small.xml"))
 
@@ -33,6 +41,14 @@ defmodule MinimalistReader.FeedParserTest do
   end
 
   describe "parse_stream/1 for Atom" do
+    test "INTEGRATION live feed" do
+      resp = Req.get!("https://www.theverge.com/rss/index.xml", into: :self)
+      res = FeedParser.parse_stream(resp.body)
+
+      assert {:ok, results, []} = res
+      assert length(results) > 0
+    end
+
     test "parses valid sample feed" do
       res = FeedParser.parse_stream(load_fixture!("atom/valid_small.xml"))
 
