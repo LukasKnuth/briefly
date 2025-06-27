@@ -47,4 +47,7 @@ defmodule MinimalistReader.FeedParser.RSS do
         {:error, reason}
     end
   end
+
+  # Ignore any other elements
+  def handle_event(_event, _data, state), do: {:ok, state}
 end
