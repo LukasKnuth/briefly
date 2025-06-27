@@ -1,7 +1,7 @@
 defmodule MinimalistReader.FeedParser do
   @behaviour Saxy.Handler
 
-  alias MinimalistReader.FeedParser.RSS
+  alias MinimalistReader.FeedParser.{Atom, RSS}
 
   defstruct mod: nil, current: nil, feed_title: nil, items: []
 
@@ -14,10 +14,9 @@ defmodule MinimalistReader.FeedParser do
     {:ok, %__MODULE__{mod: RSS}}
   end
 
-  def handle_event(:start_element, {"atom", _attr}, nil) do
-    # TODO
-    # {:ok, %__MODULE__{type: :atom}}
-    {:ok, nil}
+  def handle_event(:start_element, {"feed", _attr}, nil) do
+    # TODO do we _need_ to match on the `xmlns`?
+    {:ok, %__MODULE__{mod: Atom, current: {:feed, nil}}}
   end
 
   def handle_event(:end_document, _, %__MODULE__{items: items}) do
