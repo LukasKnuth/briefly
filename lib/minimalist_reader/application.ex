@@ -6,6 +6,7 @@ defmodule MinimalistReader.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {Task.Supervisor, name: MinimalistReader.TaskSupervisor},
       {Phoenix.PubSub, name: MinimalistReader.PubSub},
       MinimalistReaderWeb.Endpoint
     ]
