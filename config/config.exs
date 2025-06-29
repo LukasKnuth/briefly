@@ -14,9 +14,6 @@ config :minimalist_reader, MinimalistReaderWeb.Endpoint,
   pubsub_server: MinimalistReader.PubSub,
   live_view: [signing_salt: "K67JddHK"]
 
-config :minimalist_reader, MinimalistReader.Config,
-  file_path: System.get_env("CONFIG_PATH") || "/etc/minimalist_reader/feeds.yml"
-
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",

@@ -23,4 +23,7 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  config :minimalist_reader, MinimalistReader.Config,
+    file_path: System.get_env("CONFIG_PATH") || "/etc/minimalist_reader/feeds.yml"
 end
