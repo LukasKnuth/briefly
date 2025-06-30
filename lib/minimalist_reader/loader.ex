@@ -4,21 +4,19 @@ defmodule MinimalistReader.Loader do
   """
   alias MinimalistReader.FeedParser
 
-  @default_opts [{:timeout, :timer.seconds(2)}, :mod_fun]
+  @default_opts [{:timeout, :timer.seconds(2)}]
 
   @type url :: binary()
-  @spec load_all([url]) :: %{
+  @spec load_all([url], (url -> any())) :: %{
           url => {:ok, FeedParser.item(), FeedParser.problem()} | {:error, any()}
         }
-  def load_all(urls, opts \\ []) when is_list(urls) do
+  def load_all(urls, fun, opts \\ []) when is_list(urls) and is_function(fun, 1) do
     opts = Keyword.validate!(opts, @default_opts)
 
     MinimalistReader.TaskSupervisor
     |> Task.Supervisor.async_stream_nolink(
       urls,
-      __MODULE__,
-      :do_work,
-      [opts],
+      &do_work(&1, fun),
       ordered: false,
       timeout: Keyword.fetch!(opts, :timeout),
       on_timeout: :kill_task,
@@ -33,9 +31,8 @@ defmodule MinimalistReader.Loader do
     end)
   end
 
-  def do_work(url, opts) do
-    {module, function} = Keyword.fetch!(opts, :mod_fun)
-    result = apply(module, function, [url])
+  def do_work(url, fun) do
+    result = fun.(url)
     {url, result}
   rescue
     error -> {url, {:error, error}}
