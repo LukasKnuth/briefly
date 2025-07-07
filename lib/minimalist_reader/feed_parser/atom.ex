@@ -5,6 +5,7 @@ defmodule MinimalistReader.FeedParser.Atom do
   Implements a small subset of the Atom standard, as defined here:
   https://validator.w3.org/feed/docs/atom.html
   """
+  alias MinimalistReader.Models.Problem
   alias MinimalistReader.FeedParser, as: State
   alias MinimalistReader.Models.Item
 
@@ -38,7 +39,8 @@ defmodule MinimalistReader.FeedParser.Atom do
     case fetch_attribute(attributes, "href") do
       nil ->
         # No link information available, don't set value
-        {:ok, %{state | problems: [{state.item_index, :malformed_link} | state.problems]}}
+        problem = Problem.from_item(state.item_index, "link missing")
+        {:ok, %{state | problems: [problem | state.problems]}}
 
       link when is_binary(link) ->
         entry = {link, fetch_attribute(attributes, "rel")}
@@ -84,12 +86,14 @@ defmodule MinimalistReader.FeedParser.Atom do
 
       {:ok, %{state | items: [item | state.items]}}
     else
-      # Item didn't have required fields, ignore it
       :error ->
-        {:ok, %{state | problems: [{state.item_index, :missing_fields} | state.problems]}}
+        # Item didn't have required fields, ignore it
+        problem = Problem.from_item(state.item_index, "missing required fields")
+        {:ok, %{state | problems: [problem | state.problems]}}
 
-      {:error, reason} ->
-        {:ok, %{state | problems: [{state.item_index, {:date, reason}} | state.problems]}}
+      {:error, _reason} ->
+        problem = Problem.from_item(state.item_index, "invalid date format")
+        {:ok, %{state | problems: [problem | state.problems]}}
     end
   end
 

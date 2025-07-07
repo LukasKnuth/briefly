@@ -6,7 +6,7 @@ defmodule MinimalistReader.FeedParser.RSS do
   https://www.rssboard.org/rss-specification
   """
   alias MinimalistReader.FeedParser, as: State
-  alias MinimalistReader.Models.Item
+  alias MinimalistReader.Models.{Item, Problem}
 
   @item_elements ~w(title link pubDate)
 
@@ -66,10 +66,12 @@ defmodule MinimalistReader.FeedParser.RSS do
     else
       # Item didn't have required fields, ignore it
       :error ->
-        {:ok, %{state | problems: [{state.item_index, :missing_fields} | state.problems]}}
+        problem = Problem.from_item(state.item_index, "missing required fields")
+        {:ok, %{state | problems: [problem | state.problems]}}
 
       {:error, reason} ->
-        {:ok, %{state | problems: [{state.item_index, {:date, reason}} | state.problems]}}
+        problem = Problem.from_item(state.item_index, reason)
+        {:ok, %{state | problems: [problem | state.problems]}}
     end
   end
 

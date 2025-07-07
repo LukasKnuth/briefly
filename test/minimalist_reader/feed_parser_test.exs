@@ -1,6 +1,7 @@
 defmodule MinimalistReader.FeedParserTest do
   use ExUnit.Case, async: true
 
+  alias MinimalistReader.Models.Problem
   alias MinimalistReader.FeedParser
   alias MinimalistReader.Models.Item
 
@@ -29,14 +30,21 @@ defmodule MinimalistReader.FeedParserTest do
     test "errors if entry has malformed date" do
       res = FeedParser.parse_stream(load_fixture!("rss/malformed_date.xml"))
 
-      assert {:ok, [], [{0, {:date, _error}}]} = res
+      assert {:ok, [], [%Problem{} = problem]} = res
+      assert problem.reason =~ "index 0"
+      assert problem.message =~ "weekday abbreviation"
     end
 
     test "skips entries missing required fields" do
       res = FeedParser.parse_stream(load_fixture!("rss/incomplete_entries.xml"))
 
       assert {:ok, [], problems} = res
-      for problem <- problems, do: assert({_idx, :missing_fields} = problem)
+
+      Enum.with_index(problems)
+      |> Enum.each(fn {%Problem{reason: reason, message: message}, idx} ->
+        assert reason =~ "index #{idx}"
+        assert message == "missing required fields"
+      end)
     end
   end
 
@@ -65,13 +73,20 @@ defmodule MinimalistReader.FeedParserTest do
     test "errors if entry has malformed date" do
       res = FeedParser.parse_stream(load_fixture!("atom/malformed_date.xml"))
 
-      assert {:ok, [], [{0, {:date, :invalid_format}}]} = res
+      assert {:ok, [], [%Problem{} = problem]} = res
+      assert problem.reason =~ "index 0"
+      assert problem.message =~ "invalid date format"
     end
 
     test "errors if entry has malformed link" do
       res = FeedParser.parse_stream(load_fixture!("atom/malformed_link.xml"))
 
-      assert {:ok, [], [{0, :malformed_link}, {0, :missing_fields}]} = res
+      assert {:ok, [], [%Problem{} = first, %Problem{} = second]} = res
+      # Two errors for the same item!
+      assert first.reason =~ "index 0"
+      assert first.message =~ "link missing"
+      assert second.reason =~ "index 0"
+      assert second.message =~ "missing required fields"
     end
 
     test "falls back to `updated` if item has no `published` date" do
@@ -104,7 +119,12 @@ defmodule MinimalistReader.FeedParserTest do
       res = FeedParser.parse_stream(load_fixture!("atom/incomplete_entries.xml"))
 
       assert {:ok, [], problems} = res
-      for problem <- problems, do: assert({_idx, :missing_fields} = problem)
+
+      Enum.with_index(problems)
+      |> Enum.each(fn {%Problem{reason: reason, message: message}, idx} ->
+        assert reason =~ "index #{idx}"
+        assert message == "missing required fields"
+      end)
     end
   end
 
