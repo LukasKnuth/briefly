@@ -32,7 +32,21 @@ defmodule MinimalistReader.StorageTest do
     end
   end
 
-  describe "feed/1" do
+  describe "items/0" do
+    test "returns all items, sorted by date" do
+      state = %Storage{
+        items: [
+          make_item("itemA", ~U[2020-10-23 17:00:00Z]),
+          make_item("itemB", ~U[2020-10-23 14:00:00Z])
+        ]
+      }
+
+      assert {:reply, [%Item{link: "itemB"}, %Item{link: "itemA"}], ^state} =
+               Storage.handle_call(:all_items, nil, state)
+    end
+  end
+
+  describe "items/1" do
     test "returns only items after the cutoff" do
       state = %Storage{
         items: [
@@ -42,7 +56,7 @@ defmodule MinimalistReader.StorageTest do
       }
 
       assert {:reply, [%Item{link: "itemB"}], ^state} =
-               Storage.handle_call({:feed, ~U[2020-10-23 14:30:00Z]}, nil, state)
+               Storage.handle_call({:items, ~U[2020-10-23 14:30:00Z]}, nil, state)
     end
 
     test "sorts returned items by date" do
@@ -54,7 +68,7 @@ defmodule MinimalistReader.StorageTest do
       }
 
       assert {:reply, [%Item{link: "itemB"}, %Item{link: "itemA"}], ^state} =
-               Storage.handle_call({:feed, ~U[2020-10-23 13:00:00Z]}, nil, state)
+               Storage.handle_call({:items, ~U[2020-10-23 13:00:00Z]}, nil, state)
     end
 
     test "returns empty list if no items match" do
@@ -66,7 +80,7 @@ defmodule MinimalistReader.StorageTest do
       }
 
       assert {:reply, [], ^state} =
-               Storage.handle_call({:feed, ~U[2020-10-23 18:00:00Z]}, nil, state)
+               Storage.handle_call({:items, ~U[2020-10-23 18:00:00Z]}, nil, state)
     end
   end
 

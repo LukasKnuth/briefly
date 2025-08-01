@@ -16,7 +16,8 @@ defmodule MinimalistReader.Storage do
   def replace(items, problems) when is_list(items) and is_list(problems),
     do: GenServer.cast(__MODULE__, {:replace, items, problems})
 
-  def feed(%DateTime{} = cutoff), do: GenServer.call(__MODULE__, {:feed, cutoff})
+  def items, do: GenServer.call(__MODULE__, :all_items)
+  def items(%DateTime{} = cutoff), do: GenServer.call(__MODULE__, {:items, cutoff})
   def problems, do: GenServer.call(__MODULE__, :problems)
 
   ##### SERVER ####
@@ -27,14 +28,20 @@ defmodule MinimalistReader.Storage do
     {:noreply, %{state | items: items, problems: problems}}
   end
 
-  def handle_call({:feed, cutoff}, _from, %__MODULE__{items: items} = state) do
+  def handle_call(:all_items, _from, %__MODULE__{items: items} = state) do
+    {:reply, sort_items(items), state}
+  end
+
+  def handle_call({:items, cutoff}, _from, %__MODULE__{items: items} = state) do
     items
     |> Enum.filter(fn %Item{date: released} -> DateTime.after?(released, cutoff) end)
-    |> Enum.sort_by(fn %Item{date: date} -> date end, DateTime)
+    |> sort_items()
     |> then(&{:reply, &1, state})
   end
 
   def handle_call(:problems, _from, %__MODULE__{problems: problems} = state) do
     {:reply, problems, state}
   end
+
+  defp sort_items(items), do: Enum.sort_by(items, & &1.date, DateTime)
 end
