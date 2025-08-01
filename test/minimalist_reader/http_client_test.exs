@@ -3,6 +3,8 @@ defmodule MinimalistReader.HttpClientTest do
 
   alias MinimalistReader.HttpClient
 
+  setup {Req.Test, :verify_on_exit!}
+
   describe "stream_get/2" do
     test "returns body stream on 200 response" do
       Req.Test.stub(__MODULE__, &Req.Test.text(&1, "this works!"))
