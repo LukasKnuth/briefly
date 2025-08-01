@@ -30,6 +30,7 @@ defmodule MinimalistReader.Storage do
   def handle_call({:feed, cutoff}, _from, %__MODULE__{items: items} = state) do
     items
     |> Enum.filter(fn %Item{date: released} -> DateTime.after?(released, cutoff) end)
+    |> Enum.sort_by(fn %Item{date: date} -> date end, DateTime)
     |> then(&{:reply, &1, state})
   end
 
