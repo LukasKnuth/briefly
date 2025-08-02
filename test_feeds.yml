@@ -1,0 +1,8 @@
+feeds:
+  - url: https://lknuth.dev/writings/index.xml
+    group: Blogs
+  - url: https://bytes.zone/index.xml
+    group: Blogs
+  - url: https://feeds.bbci.co.uk/news/world/rss.xml
+    group: News
+
