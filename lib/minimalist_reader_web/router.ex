@@ -17,6 +17,8 @@ defmodule MinimalistReaderWeb.Router do
   scope "/", MinimalistReaderWeb do
     pipe_through :browser
 
-    get "/", PageController, :feed
+    get "/since/:days", PageController, :feed
+
+    post "/refresh", PageController, :refresh
   end
 end
