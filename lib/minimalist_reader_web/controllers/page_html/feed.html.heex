@@ -1,0 +1,19 @@
+<.flash_group flash={@flash} />
+<div class="">
+  <h1 class="text-3xl font-bold">Feed</h1>
+  <ol>
+    <li :for={item <- @items} class="py-2">
+      <div>
+        <a href={item.link} class="text-lg underline text-blue-600 visited:text-purple-600">
+          <%= item.title %>
+        </a>
+      </div>
+      <div class="text-gray-400">
+        <span>Published</span>
+        <span><%= render_date(item.date) %></span>
+        <span>by</span>
+        <span class="font-bold"><%= item.feed %></span>
+      </div>
+    </li>
+  </ol>
+</div>
