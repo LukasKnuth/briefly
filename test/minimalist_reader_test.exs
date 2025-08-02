@@ -59,6 +59,39 @@ defmodule MinimalistReaderTest do
     end
   end
 
+  describe "list_items" do
+    test "loads items for given timezone" do
+      now = DateTime.now!("Etc/UTC")
+
+      Storage.replace(
+        [
+          %Item{date: DateTime.add(now, -1, :day), link: "itemA", title: "Mock A", feed: "Test"},
+          %Item{date: DateTime.add(now, -2, :day), link: "itemB", title: "Mock B", feed: "Test"},
+          %Item{date: DateTime.add(now, -3, :day), link: "itemC", title: "Mock C", feed: "Test"}
+        ],
+        []
+      )
+
+      assert [%{link: "itemA"}, %{link: "itemB"}] = MinimalistReader.list_items(2, "Etc/UTC")
+    end
+
+    test "respects given timezone when calculating cutoff" do
+      # NOTE: Time is complicated. Berlin is `+2` - the plus meaning its _ahead_ of lower-value
+      # timezones like Los Angeles which is `-7`. Due to the earths rotation, the new days sun
+      # touches Berlin _before_ it touches Los Angeles. 
+      published = DateTime.now!("Europe/Berlin") |> Timex.beginning_of_day()
+
+      Storage.replace([%Item{date: published, link: "itemA", title: "Mock A"}], [])
+
+      # From LA, the Berlin article was released _yesterday_
+      assert MinimalistReader.list_items(0, "America/Los_Angeles") == []
+      # From Sydney, the Berlin article was released _today_
+      assert [%{link: "itemA"}] = MinimalistReader.list_items(0, "Australia/Sydney")
+      # If we include yesterday, it shows up in LA as well
+      assert [%{link: "itemA"}] = MinimalistReader.list_items(1, "America/Los_Angeles")
+    end
+  end
+
   defp mock_opts(config_file, opts \\ []) do
     opts
     |> Keyword.put_new(:plug, {Req.Test, __MODULE__})

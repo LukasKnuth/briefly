@@ -44,4 +44,20 @@ defmodule MinimalistReader do
   end
 
   defdelegate list_problems, to: Storage, as: :problems
+
+  @doc """
+  Retunrs feed items from **up to** `days_ago`.
+  It always uses the _beginning of the day_. If `days_ago` is `0`, only items from **today**
+  are retunred. If it is `1`, items from today **and yesterday** are returned. If its `2`,
+  items of the last three days are returned.
+  """
+  def list_items(days_ago, timezone) do
+    # NOTE: Timex automatically installs its full Timezone Database
+    with {:ok, now} <- DateTime.now(timezone) do
+      now
+      |> Timex.beginning_of_day()
+      |> Timex.shift(days: -days_ago)
+      |> Storage.items()
+    end
+  end
 end
