@@ -9,7 +9,8 @@ defmodule MinimalistReader.Application do
       MinimalistReader.Storage,
       {Task.Supervisor, name: MinimalistReader.TaskSupervisor},
       {Phoenix.PubSub, name: MinimalistReader.PubSub},
-      MinimalistReaderWeb.Endpoint
+      MinimalistReaderWeb.Endpoint,
+      {Task, fn -> MinimalistReader.refresh() end}
     ]
 
     opts = [strategy: :one_for_one, name: MinimalistReader.Supervisor]
