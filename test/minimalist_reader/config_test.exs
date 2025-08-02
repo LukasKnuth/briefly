@@ -14,7 +14,7 @@ defmodule MinimalistReader.ConfigTest do
                 %Config{url: "https://feeds.bbci.co.uk/news/world/europe/rss.xml", group: "News"},
                 %Config{url: "https://example.com/madeup/rss", group: nil},
                 %Config{url: "https://www.theverge.com/rss/index.xml", group: "News"}
-              ]} == Config.load_config()
+              ]} == Config.load_config(fixture_override("valid.yml"))
     end
 
     test "skips malformed entry and logs" do

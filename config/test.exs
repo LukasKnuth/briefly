@@ -12,6 +12,3 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
-
-# Set valid config as default fixture
-config :minimalist_reader, MinimalistReader.Config, file_path: "test/fixtures/config/valid.yml"
