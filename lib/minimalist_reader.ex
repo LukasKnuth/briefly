@@ -2,6 +2,8 @@ defmodule MinimalistReader do
   @moduledoc """
   High-level integration point for the web portion of the project.
   """
+  require Logger
+
   alias MinimalistReader.{FeedParser, Storage, Loader, Config, HttpClient}
   alias MinimalistReader.Models.{Problem, Item}
 
@@ -36,9 +38,11 @@ defmodule MinimalistReader do
           end
         end)
 
+      Logger.info("DID complete feed refresh")
       Storage.replace(Enum.reverse(items), Enum.reverse(problems))
     else
       {:error, reason} ->
+        Logger.error("DID fail to read config during feed refresh")
         Storage.replace([], [Problem.from_config(reason)])
     end
   end
