@@ -21,8 +21,8 @@ defmodule MinimalistReaderTest do
       assert Storage.problems() == []
 
       assert [
-               %{group: "Test", title: "RSS Entry", feed: "RSS Feed"},
-               %{group: "Test", title: "Atom Entry", feed: "Atom Feed"}
+               %{group: "Test", title: "Atom Entry", feed: "Atom Feed"},
+               %{group: "Test", title: "RSS Entry", feed: "RSS Feed"}
              ] = Storage.items(~U[2023-11-11 12:00:00Z])
     end
 

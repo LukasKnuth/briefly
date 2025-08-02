@@ -33,7 +33,7 @@ defmodule MinimalistReader.StorageTest do
   end
 
   describe "items/0" do
-    test "returns all items, sorted by date" do
+    test "returns all items, newest first" do
       state = %Storage{
         items: [
           make_item("itemA", ~U[2020-10-23 17:00:00Z]),
@@ -41,7 +41,7 @@ defmodule MinimalistReader.StorageTest do
         ]
       }
 
-      assert {:reply, [%Item{link: "itemB"}, %Item{link: "itemA"}], ^state} =
+      assert {:reply, [%Item{link: "itemA"}, %Item{link: "itemB"}], ^state} =
                Storage.handle_call(:all_items, nil, state)
     end
   end
@@ -59,7 +59,7 @@ defmodule MinimalistReader.StorageTest do
                Storage.handle_call({:items, ~U[2020-10-23 14:30:00Z]}, nil, state)
     end
 
-    test "sorts returned items by date" do
+    test "returns items newest by date" do
       state = %Storage{
         items: [
           make_item("itemA", ~U[2020-10-23 17:00:00Z]),
@@ -67,7 +67,7 @@ defmodule MinimalistReader.StorageTest do
         ]
       }
 
-      assert {:reply, [%Item{link: "itemB"}, %Item{link: "itemA"}], ^state} =
+      assert {:reply, [%Item{link: "itemA"}, %Item{link: "itemB"}], ^state} =
                Storage.handle_call({:items, ~U[2020-10-23 13:00:00Z]}, nil, state)
     end
 

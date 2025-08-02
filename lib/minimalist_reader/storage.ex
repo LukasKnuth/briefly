@@ -29,13 +29,13 @@ defmodule MinimalistReader.Storage do
   end
 
   def handle_call(:all_items, _from, %__MODULE__{items: items} = state) do
-    {:reply, sort_items(items), state}
+    {:reply, newest_first(items), state}
   end
 
   def handle_call({:items, cutoff}, _from, %__MODULE__{items: items} = state) do
     items
     |> Enum.filter(fn %Item{date: released} -> DateTime.after?(released, cutoff) end)
-    |> sort_items()
+    |> newest_first()
     |> then(&{:reply, &1, state})
   end
 
@@ -43,5 +43,5 @@ defmodule MinimalistReader.Storage do
     {:reply, problems, state}
   end
 
-  defp sort_items(items), do: Enum.sort_by(items, & &1.date, DateTime)
+  defp newest_first(items), do: Enum.sort_by(items, & &1.date, {:desc, DateTime})
 end
