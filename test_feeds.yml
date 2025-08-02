@@ -4,5 +4,10 @@ feeds:
   - url: https://bytes.zone/index.xml
     group: Blogs
   - url: https://feeds.bbci.co.uk/news/world/rss.xml
-    group: News
+    group: News International
+  - url:  https://www.tagesschau.de/ausland/index~rss2.xml
+    group: News International
+  - url: https://www.tagesschau.de/inland/index~rss2.xml
+    group: News Deutschland
+  - http://stadt-bremerhaven.de/feed
 
