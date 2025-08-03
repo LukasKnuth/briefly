@@ -1,6 +1,21 @@
 defmodule MinimalistReaderWeb.PageController do
   use MinimalistReaderWeb, :controller
 
+  @doc "A configurable start view for the feed"
+  def home(conn, _params) do
+    path_params =
+      :minimalist_reader
+      |> Application.fetch_env!(__MODULE__)
+      |> Keyword.fetch!(:home_action)
+      |> then(&%{"days" => &1})
+
+    # NOTE: Set `path_params` in conn also, so that the header marks the correct entry as active.
+    %Plug.Conn{conn | path_params: path_params}
+    # NOTE: Why not redirect? CURL does not follow redirects by default. We want to make
+    # using clients other than browsers simple.
+    |> feed(path_params)
+  end
+
   @doc "Renders the items parsed from all configured feeds"
   def feed(conn, params) do
     # TODO get timezone from user

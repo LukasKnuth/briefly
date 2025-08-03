@@ -7,6 +7,9 @@ end
 config :minimalist_reader, MinimalistReader.Config,
   file_path: System.get_env("CONFIG_PATH") || "/etc/minimalist_reader/feeds.yml"
 
+config :minimalist_reader, MinimalistReaderWeb.PageController,
+  home_action: System.get_env("HOME_ACTION") || "today"
+
 if config_env() == :prod do
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||

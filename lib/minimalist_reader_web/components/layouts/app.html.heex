@@ -5,9 +5,14 @@
       <ol class="font-semibold leading-6 text-zinc-900">
         <li>
           <a
-            :for={{days, title} <- days_ago()}
-            href={~p[/since/#{days}]}
-            class="inline-block before:content-['['] before:text-blue-300 before:pl-1 after:content-[']'] after:text-blue-300 after:pr-1"
+            :for={{path, title} <- days_ago()}
+            href={~p[/since/#{path}]}
+            class={[
+              "inline-block",
+              "before:content-['['] before:text-blue-300 before:pl-1",
+              "after:content-[']'] after:text-blue-300 after:pr-1",
+              Map.get(@conn.path_params, "days") == path && "underline underline-offset-8"
+            ]}
           >
             <%= title %>
           </a>
