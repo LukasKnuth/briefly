@@ -46,7 +46,7 @@ defmodule MinimalistReader.MixProject do
       {:gettext, "~> 0.20"},
       # LiveView
       {:phoenix_live_view, "~> 0.20.2"},
-      {:floki, ">= 0.30.0", only: :test},
+      {:lazy_html, "~> 0.1.3", only: :test},
       # Assets
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},

@@ -3,10 +3,10 @@
   <%= if length(@grouped_items) == 0 do %>
     <p class="text-lg text-stone-400 text-center mt-3">Nothing is here...</p>
   <% end %>
-  <div :for={{group, items} <- @grouped_items} class="mt-3">
+  <div :for={{group, items} <- @grouped_items} class="group mt-3">
     <h2 class="text-2xl"><%= group %></h2>
     <ol class="pl-2">
-      <li :for={item <- items} class="py-2">
+      <li :for={item <- items} class="item py-2">
         <div>
           <a href={item.link} class="text-lg underline text-blue-600 visited:text-purple-600">
             <%= item.title %>
