@@ -1,3 +1,4 @@
 {
-	"custom_stop_words": ["defdelegate"]
+	"custom_stop_words": ["defdelegate"],
+	"skip_files": ["test/support/"]
 }
