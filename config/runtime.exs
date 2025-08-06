@@ -1,4 +1,5 @@
 import Config
+require Logger
 
 if System.get_env("PHX_SERVER") do
   config :minimalist_reader, MinimalistReaderWeb.Endpoint, server: true
@@ -9,6 +10,22 @@ config :minimalist_reader, MinimalistReader.Config,
 
 config :minimalist_reader, MinimalistReaderWeb.PageController,
   home_action: System.get_env("HOME_ACTION") || "today"
+
+refresh_job =
+  with schedule when is_binary(schedule) <- System.get_env("CRON_REFRESH", nil) do
+    [schedule: Crontab.CronExpression.Parser.parse!(schedule)]
+  else
+    _ ->
+      Logger.info("Env variable 'CRON_REFRESH' not set, automatic refresh DISABLED")
+      [state: :inactive]
+  end
+
+config :minimalist_reader, MinimalistReader.CronScheduler,
+  overlap: false,
+  jobs: [
+    startup: [task: {MinimalistReader, :refresh, []}, schedule: "@reboot"],
+    refresh: [task: {MinimalistReader, :refresh, []}] |> Keyword.merge(refresh_job)
+  ]
 
 if config_env() == :prod do
   secret_key_base =

@@ -58,7 +58,9 @@ defmodule MinimalistReader.MixProject do
       # Web requests
       {:req, "~> 0.5.12"},
       # Config file format
-      {:yaml_elixir, "~> 2.11"}
+      {:yaml_elixir, "~> 2.11"},
+      # CRON runner
+      {:quantum, "~> 3.5"}
     ]
   end
 

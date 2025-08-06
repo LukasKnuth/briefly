@@ -10,7 +10,7 @@ defmodule MinimalistReader.Application do
       {Task.Supervisor, name: MinimalistReader.TaskSupervisor},
       {Phoenix.PubSub, name: MinimalistReader.PubSub},
       MinimalistReaderWeb.Endpoint,
-      {Task, fn -> MinimalistReader.refresh() end}
+      MinimalistReader.CronScheduler
     ]
 
     opts = [strategy: :one_for_one, name: MinimalistReader.Supervisor]
