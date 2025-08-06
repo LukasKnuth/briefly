@@ -4,33 +4,33 @@ defmodule MinimalistReaderWeb.PageControllerTest do
   import MinimalistReader.EnumAssertions
 
   alias MinimalistReader.Storage
-  alias MinimalistReader.Models.Item
+  alias MinimalistReader.Models.{Problem, Item}
 
   @app :minimalist_reader
   @home_mod MinimalistReaderWeb.PageController
 
+  setup do
+    now = DateTime.now!("Etc/UTC") |> Timex.set(hour: 10, minute: 0, second: 0)
+
+    Storage.replace(
+      [
+        make_item("itemA1", date: Timex.shift(now, hours: -1), group: "News"),
+        make_item("itemA2", date: Timex.shift(now, hours: -2), group: "Blog"),
+        make_item("itemA3", date: Timex.shift(now, hours: -3), group: "Fashion"),
+        make_item("itemB1", date: Timex.shift(now, days: -1, hours: -1), group: "News"),
+        make_item("itemB2", date: Timex.shift(now, days: -1, hours: -2), group: "Blog"),
+        make_item("itemB3", date: Timex.shift(now, days: -1, hours: -3), group: "Fashion"),
+        make_item("itemC1", date: Timex.shift(now, days: -2, hours: -1), group: "News"),
+        make_item("itemC2", date: Timex.shift(now, days: -2, hours: -2), group: "Blog"),
+        make_item("itemC3", date: Timex.shift(now, days: -2, hours: -3), group: "Fashion")
+      ],
+      []
+    )
+
+    :ok
+  end
+
   describe "GET /since/:days_ago" do
-    setup do
-      now = DateTime.now!("Etc/UTC") |> Timex.set(hour: 10, minute: 0, second: 0)
-
-      Storage.replace(
-        [
-          make_item("itemA1", date: Timex.shift(now, hours: -1), group: "News"),
-          make_item("itemA2", date: Timex.shift(now, hours: -2), group: "Blog"),
-          make_item("itemA3", date: Timex.shift(now, hours: -3), group: "Fashion"),
-          make_item("itemB1", date: Timex.shift(now, days: -1, hours: -1), group: "News"),
-          make_item("itemB2", date: Timex.shift(now, days: -1, hours: -2), group: "Blog"),
-          make_item("itemB3", date: Timex.shift(now, days: -1, hours: -3), group: "Fashion"),
-          make_item("itemC1", date: Timex.shift(now, days: -2, hours: -1), group: "News"),
-          make_item("itemC2", date: Timex.shift(now, days: -2, hours: -2), group: "Blog"),
-          make_item("itemC3", date: Timex.shift(now, days: -2, hours: -3), group: "Fashion")
-        ],
-        []
-      )
-
-      :ok
-    end
-
     for {path, expected} <- [
           # NOTE: Order is affected by the grouping.
           {"today", ~w(itemA2 itemA3 itemA1)},
@@ -79,7 +79,18 @@ defmodule MinimalistReaderWeb.PageControllerTest do
       end)
     end
 
-    test "adds info box if there where problems reading feeds"
+    test "adds info box if there where problems reading feeds", %{conn: conn} do
+      Storage.replace([], [%Problem{reason: "Test", message: "Just a test", url: "https://a.com"}])
+
+      conn
+      |> get(~p"/since/today")
+      |> html_response(200)
+      |> LazyHTML.from_document()
+      |> LazyHTML.query("header a.problem-indicator")
+      |> assert_only_one("1 problem", fn element, text ->
+        LazyHTML.text(element) =~ text
+      end)
+    end
   end
 
   describe "GET /" do
@@ -87,6 +98,7 @@ defmodule MinimalistReaderWeb.PageControllerTest do
       old = Application.get_env(@app, @home_mod)
       Application.put_env(@app, @home_mod, home_action: "yesterday")
       on_exit(:env_cleanup, fn -> Application.put_env(@app, @home_mod, old) end)
+      :ok
     end
 
     test "renders the configured page without redirect", %{conn: conn} do
@@ -98,6 +110,54 @@ defmodule MinimalistReaderWeb.PageControllerTest do
       |> assert_list_exactly_ordered(~w(itemA2 itemB2 itemA3 itemB3 itemA1 itemB1), fn element,
                                                                                        link ->
         LazyHTML.attribute(element, "href") == [link]
+      end)
+    end
+  end
+
+  describe "GET /problems" do
+    setup do
+      Storage.replace([], [
+        %Problem{
+          reason: "Config",
+          message: "File not found at given path 'asdf/gasdf/config.yml'"
+        },
+        %Problem{
+          reason: "Feed",
+          message: "Network error fetching feed: timeout",
+          url: "https://my.page/section/subscection/veryspecific.rss"
+        },
+        %Problem{
+          reason: "Item at index 4",
+          message: "Invalid date, formatted as aasdf, expected 1412a",
+          url: "https://some/feedwithlongerurl.rss.xml"
+        },
+        %Problem{
+          reason: "AssertionFailedError",
+          message: "Expected a = b to hold, but didn't",
+          url: "https://another.page/with/a/longer/url/than/youdexpect"
+        }
+      ])
+
+      :ok
+    end
+
+    test "lists all problems encountered", %{conn: conn} do
+      conn
+      |> get(~p"/problems")
+      |> html_response(200)
+      |> LazyHTML.from_document()
+      |> LazyHTML.query("main .problem")
+      |> assert_list_exactly_ordered(Enum.with_index(Storage.problems(), 1), fn element,
+                                                                                {problem, i} ->
+        assert LazyHTML.query(element, ".index") |> LazyHTML.text() =~ to_string(i)
+        assert LazyHTML.query(element, ".reason") |> LazyHTML.text() =~ problem.reason
+        assert LazyHTML.query(element, ".message") |> LazyHTML.text() =~ problem.message
+
+        if is_nil(problem.url) do
+          assert LazyHTML.query(element, ".url") |> Enum.count() == 0
+        else
+          assert LazyHTML.query(element, ".url") |> LazyHTML.text() =~ problem.url
+        end
       end)
     end
   end

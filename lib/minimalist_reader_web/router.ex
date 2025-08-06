@@ -20,6 +20,8 @@ defmodule MinimalistReaderWeb.Router do
     get "/", PageController, :home
     get "/since/:days", PageController, :feed
 
+    get "/problems", PageController, :problems
+
     post "/refresh", PageController, :refresh
   end
 end

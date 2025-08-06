@@ -13,4 +13,14 @@ defmodule MinimalistReaderWeb.Layouts do
       {"7d", "Last week"}
     ]
   end
+
+  def problem_label do
+    MinimalistReader.list_problems()
+    |> length()
+    |> case do
+      0 -> nil
+      1 -> "⚠️ 1 problem"
+      n -> "⚠️ #{n} problems"
+    end
+  end
 end

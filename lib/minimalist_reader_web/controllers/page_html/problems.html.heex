@@ -1,0 +1,23 @@
+<div class="mb-10 md:mb-32 mt-2">
+  <h1 class="text-2xl">Problems</h1>
+  <%= if length(@problems) == 0 do %>
+    <p class="text-lg text-stone-400 text-center mt-3">No issues found.</p>
+  <% else %>
+    <p class="py-2 px-3 md:px-6 my-3 bg-gray-200 rounded">
+      Problems encountered while loading or parsing the configured feeds.
+    </p>
+    <ul>
+      <li :for={{p, i} <- Enum.with_index(@problems, 1)} class="problem py-2">
+        <div>
+          <span class="index"><%= i %>.</span>
+          <span class="reason font-bold"><%= p.reason %>:</span>
+          <span class="message"><%= p.message %></span>
+        </div>
+        <div :if={p.url} class="text-gray-400">
+          <span>URL:</span>
+          <span><code class="url"><%= p.url %></code></span>
+        </div>
+      </li>
+    </ul>
+  <% end %>
+</div>

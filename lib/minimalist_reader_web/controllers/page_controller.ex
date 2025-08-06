@@ -16,6 +16,11 @@ defmodule MinimalistReaderWeb.PageController do
     |> feed(path_params)
   end
 
+  @doc "Lists any problems encountered while parsing the feeds"
+  def problems(conn, _params) do
+    render(conn, :problems, problems: MinimalistReader.list_problems())
+  end
+
   @doc "Renders the items parsed from all configured feeds"
   def feed(conn, params) do
     params
