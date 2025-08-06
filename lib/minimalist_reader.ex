@@ -54,14 +54,24 @@ defmodule MinimalistReader do
   It always uses the _beginning of the day_. If `days_ago` is `0`, only items from **today**
   are retunred. If it is `1`, items from today **and yesterday** are returned. If its `2`,
   items of the last three days are returned.
+
+  **Raises** If the given TimeZone is not supported.
   """
-  def list_items(days_ago, timezone) do
+  def list_items(opts) do
+    opts = Keyword.validate!(opts, [:days_ago, :now, timezone: "Etc/UTC"])
+
+    opts
+    |> now!()
+    |> Timex.beginning_of_day()
+    |> Timex.shift(days: -Keyword.get(opts, :days_ago))
+    |> Storage.items()
+  end
+
+  defp now!(opts) do
     # NOTE: Timex automatically installs its full Timezone Database
-    with {:ok, now} <- DateTime.now(timezone) do
-      now
-      |> Timex.beginning_of_day()
-      |> Timex.shift(days: -days_ago)
-      |> Storage.items()
+    case Keyword.fetch(opts, :now) do
+      {:ok, now} -> now
+      :error -> Keyword.get(opts, :timezone) |> DateTime.now!()
     end
   end
 end

@@ -60,7 +60,7 @@ defmodule MinimalistReaderTest do
   end
 
   describe "list_items" do
-    test "loads items for given timezone" do
+    test "falls back to UTC if no timezone is given" do
       now = DateTime.now!("Etc/UTC")
 
       Storage.replace(
@@ -72,23 +72,45 @@ defmodule MinimalistReaderTest do
         []
       )
 
-      assert [%{link: "itemA"}, %{link: "itemB"}] = MinimalistReader.list_items(2, "Etc/UTC")
+      assert [%{link: "itemA"}, %{link: "itemB"}] = MinimalistReader.list_items(days_ago: 2)
     end
 
     test "respects given timezone when calculating cutoff" do
       # NOTE: Time is complicated. Berlin is `+2` - the plus meaning its _ahead_ of lower-value
       # timezones like Los Angeles which is `-7`. Due to the earths rotation, the new days sun
       # touches Berlin _before_ it touches Los Angeles. 
-      published = DateTime.now!("Europe/Berlin") |> Timex.beginning_of_day()
+      date_time = ~N[2023-10-21 00:00:00]
 
-      Storage.replace([%Item{date: published, link: "itemA", title: "Mock A"}], [])
+      Storage.replace(
+        [
+          %Item{
+            date: DateTime.from_naive!(date_time, "Europe/Berlin"),
+            link: "itemA",
+            title: "Mock A"
+          }
+        ],
+        []
+      )
 
       # From LA, the Berlin article was released _yesterday_
-      assert MinimalistReader.list_items(0, "America/Los_Angeles") == []
+      assert MinimalistReader.list_items(
+               days_ago: 0,
+               now: DateTime.from_naive!(date_time, "America/Los_Angeles")
+             ) == []
+
       # From Sydney, the Berlin article was released _today_
-      assert [%{link: "itemA"}] = MinimalistReader.list_items(0, "Australia/Sydney")
+      assert [%{link: "itemA"}] =
+               MinimalistReader.list_items(
+                 days_ago: 0,
+                 now: DateTime.from_naive!(date_time, "Australia/Sydney")
+               )
+
       # If we include yesterday, it shows up in LA as well
-      assert [%{link: "itemA"}] = MinimalistReader.list_items(1, "America/Los_Angeles")
+      assert [%{link: "itemA"}] =
+               MinimalistReader.list_items(
+                 days_ago: 1,
+                 now: DateTime.from_naive!(date_time, "America/Los_Angeles")
+               )
     end
   end
 
