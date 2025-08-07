@@ -17,7 +17,8 @@ defmodule MinimalistReaderWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
+  def static_paths,
+    do: ~w(assets fonts images webapp favicon.ico favicon.svg favicon-96x96.png robots.txt)
 
   def router do
     quote do
