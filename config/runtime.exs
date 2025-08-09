@@ -6,7 +6,7 @@ if config_env() == :prod do
     file_path: System.get_env("CONFIG_PATH") || "/etc/briefly/feeds.yml"
 
   config :briefly, BrieflyWeb.PageController,
-    home_action: System.get_env("HOME_ACTION") || "today"
+    home_action: System.get_env("HOME_ACTION") || "yesterday"
 
   refresh_job =
     with schedule when is_binary(schedule) <- System.get_env("CRON_REFRESH", nil) do
