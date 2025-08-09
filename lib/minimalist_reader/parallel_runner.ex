@@ -1,4 +1,4 @@
-defmodule MinimalistReader.Loader do
+defmodule MinimalistReader.ParallelRunner do
   @moduledoc """
   A multithreaded loader component to fetch multiple feeds.
   """

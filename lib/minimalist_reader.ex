@@ -4,7 +4,7 @@ defmodule MinimalistReader do
   """
   require Logger
 
-  alias MinimalistReader.{FeedParser, Storage, Loader, Config, HttpClient}
+  alias MinimalistReader.{FeedParser, Storage, ParallelRunner, Config, HttpClient}
   alias MinimalistReader.Models.{Problem, Item}
 
   def refresh(opts \\ []) do
@@ -12,7 +12,7 @@ defmodule MinimalistReader do
       results =
         config
         |> Enum.map(fn %Config{url: url} -> url end)
-        |> Loader.load_all(fn url ->
+        |> ParallelRunner.load_all(fn url ->
           with {:ok, stream} <- HttpClient.stream_get(url, opts) do
             FeedParser.parse_stream(stream)
           end
