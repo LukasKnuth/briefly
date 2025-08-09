@@ -7,7 +7,7 @@ defmodule Briefly.Storage do
 
   alias Briefly.Models.Item
 
-  defstruct items: [], problems: []
+  defstruct items: [], problems: [], last_updated: nil
 
   # coveralls-ignore-start
   ##### CLIENT ####
@@ -19,13 +19,15 @@ defmodule Briefly.Storage do
   def items, do: GenServer.call(__MODULE__, :all_items)
   def items(%DateTime{} = cutoff), do: GenServer.call(__MODULE__, {:items, cutoff})
   def problems, do: GenServer.call(__MODULE__, :problems)
+  def last_updated, do: GenServer.call(__MODULE__, :last_updated)
 
   ##### SERVER ####
   def init(_opts), do: {:ok, %__MODULE__{}}
   # coveralls-ignore-stop
 
   def handle_cast({:replace, items, problems}, state) do
-    {:noreply, %{state | items: items, problems: problems}}
+    now = Briefly.user_timezone() |> DateTime.now!()
+    {:noreply, %{state | items: items, problems: problems, last_updated: now}}
   end
 
   def handle_call(:all_items, _from, %__MODULE__{items: items} = state) do
@@ -41,6 +43,10 @@ defmodule Briefly.Storage do
 
   def handle_call(:problems, _from, %__MODULE__{problems: problems} = state) do
     {:reply, problems, state}
+  end
+
+  def handle_call(:last_updated, _from, %__MODULE__{last_updated: last_updated} = state) do
+    {:reply, last_updated, state}
   end
 
   defp newest_first(items), do: Enum.sort_by(items, & &1.date, {:desc, DateTime})

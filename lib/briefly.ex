@@ -53,6 +53,7 @@ defmodule Briefly do
   end
 
   defdelegate list_problems, to: Storage, as: :problems
+  defdelegate last_updated, to: Storage
 
   @doc """
   Retunrs feed items from **up to** `days_ago`.

@@ -6,7 +6,7 @@ defmodule Briefly.StorageTest do
   alias Briefly.Storage
 
   describe "replace/2" do
-    test "updates items and problems in one operation" do
+    test "updates items, problems and last_updated in one operation" do
       items = [
         make_item("itemA", ~U[2020-10-23 14:00:00Z]),
         make_item("itemB", ~U[2020-10-23 17:00:00Z])
@@ -14,8 +14,10 @@ defmodule Briefly.StorageTest do
 
       problems = ["something went wrong", "something else, too"]
 
-      assert {:noreply, %Storage{items: ^items, problems: ^problems}} =
+      assert {:noreply, %Storage{items: ^items, problems: ^problems, last_updated: timestamp}} =
                Storage.handle_cast({:replace, items, problems}, %Storage{})
+
+      assert Timex.diff(timestamp, Timex.now(), :minutes) == 0
     end
 
     test "does not retain previous items/problems" do
@@ -90,6 +92,15 @@ defmodule Briefly.StorageTest do
 
       assert {:reply, ["problemA", "problemB"], ^state} =
                Storage.handle_call(:problems, nil, state)
+    end
+  end
+
+  describe "last_updated/0" do
+    test "returns the time of last update" do
+      state = %Storage{last_updated: ~U[2023-11-12 12:30:21Z]}
+
+      assert {:reply, ~U[2023-11-12 12:30:21Z], ^state} =
+               Storage.handle_call(:last_updated, nil, state)
     end
   end
 
