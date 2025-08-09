@@ -13,5 +13,11 @@ config :logger, level: :warning
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 
+# Point to any valid configuration to not cause crashes in tests
+config :briefly, Briefly.Config, file_path: "test/fixtures/integration/config_success.yml"
+
+# Use the default configuration for tests
+config :briefly, BrieflyWeb.PageController, home_action: "yesterday"
+
 # Allow global stubbing of requests sent out by Req
 config :briefly, Briefly.HttpClient, opts: [plug: {Req.Test, Briefly.HttpClientMock}]

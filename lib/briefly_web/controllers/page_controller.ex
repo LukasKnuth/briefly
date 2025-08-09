@@ -21,6 +21,12 @@ defmodule BrieflyWeb.PageController do
     render(conn, :problems, problems: Briefly.list_problems())
   end
 
+  @doc "Refreshes the feeds and renders out the home page"
+  def refresh(conn, params) do
+    :ok = Briefly.refresh()
+    home(conn, params)
+  end
+
   @doc "Renders the items parsed from all configured feeds"
   def feed(conn, params) do
     params

@@ -9,6 +9,8 @@ defmodule BrieflyWeb.PageControllerTest do
   @app :briefly
   @home_mod BrieflyWeb.PageController
 
+  setup {Req.Test, :verify_on_exit!}
+
   setup do
     now = DateTime.now!("Etc/UTC") |> Timex.set(hour: 10, minute: 0, second: 0)
 
@@ -114,6 +116,34 @@ defmodule BrieflyWeb.PageControllerTest do
     end
   end
 
+  describe "POST /refresh" do
+    test "refreshes all feeds", %{conn: conn} do
+      published = DateTime.now!("Etc/UTC")
+
+      Req.Test.expect(Briefly.HttpClientMock, 2, fn conn ->
+        case Plug.Conn.request_url(conn) do
+          "https://a.test/rss.xml" ->
+            mock_feed(conn, :rss, "https://a.test/article", DateTime.add(published, -1, :hour))
+
+          "https://b.test/atom.xml" ->
+            mock_feed(conn, :atom, "https://b.test/story", DateTime.add(published, -2, :hour))
+        end
+      end)
+
+      conn
+      |> post(~p"/refresh")
+      |> html_response(200)
+      |> LazyHTML.from_document()
+      |> LazyHTML.query("main .item a")
+      |> assert_list_exactly_ordered(
+        ["https://a.test/article", "https://b.test/story"],
+        fn element, link ->
+          LazyHTML.attribute(element, "href") == [link]
+        end
+      )
+    end
+  end
+
   describe "GET /problems" do
     setup do
       Storage.replace([], [
@@ -170,5 +200,39 @@ defmodule BrieflyWeb.PageControllerTest do
       feed: Keyword.get(opts, :feed, "Test"),
       group: Keyword.get(opts, :group, nil)
     }
+  end
+
+  defp mock_feed(conn, type, entry_link, entry_date) do
+    content = to_feed(type, entry_link, entry_date) |> Saxy.encode!(version: "1.0")
+
+    conn
+    |> Plug.Conn.put_resp_content_type("text/xml")
+    |> Plug.Conn.resp(200, content)
+  end
+
+  defp to_feed(:rss, entry_link, entry_date) do
+    Saxy.XML.element("rss", [], [
+      Saxy.XML.element("channel", [], [
+        Saxy.XML.element("title", [], [Saxy.XML.characters("Mocked RSS Feed")]),
+        Saxy.XML.element("item", [], [
+          Saxy.XML.element("title", [], [Saxy.XML.characters("Mocked RSS Entry")]),
+          Saxy.XML.element("link", [], [Saxy.XML.characters(entry_link)]),
+          Saxy.XML.element("pubDate", [], [
+            Saxy.XML.characters(Timex.format!(entry_date, "{RFC1123}"))
+          ])
+        ])
+      ])
+    ])
+  end
+
+  defp to_feed(:atom, entry_link, entry_date) do
+    Saxy.XML.element("feed", [], [
+      Saxy.XML.element("title", [], [Saxy.XML.characters("Mocked Atom Feed")]),
+      Saxy.XML.element("entry", [], [
+        Saxy.XML.element("title", [], [Saxy.XML.characters("Mocked Atom Entry")]),
+        Saxy.XML.empty_element("link", href: entry_link),
+        Saxy.XML.element("published", [], [Saxy.XML.characters(DateTime.to_iso8601(entry_date))])
+      ])
+    ])
   end
 end
