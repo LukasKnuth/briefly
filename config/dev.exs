@@ -43,6 +43,7 @@ config :phoenix, :plug_init_mode, :runtime
 config :phoenix_live_view, :debug_heex_annotations, true
 
 # ----- APPLICATION SPECIFIC CONFIG --------
+config :briefly, Briefly, timezone: "Europe/Berlin"
 config :briefly, Briefly.Config, file_path: "test_feeds.yml"
 config :briefly, BrieflyWeb.PageController, home_action: "yesterday"
 

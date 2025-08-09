@@ -8,6 +8,16 @@ if config_env() == :prod do
   config :briefly, BrieflyWeb.PageController,
     home_action: System.get_env("HOME_ACTION") || "yesterday"
 
+  timezone = System.get_env("TZ") || "Etc/UTC"
+
+  unless Timex.is_valid_timezone?(timezone) do
+    raise """
+    The timezone specified in the TZ environment variable is invalid.
+    """
+  end
+
+  config :briefly, Briefly, timezone: timezone
+
   refresh_job =
     with schedule when is_binary(schedule) <- System.get_env("CRON_REFRESH", nil) do
       [schedule: Crontab.CronExpression.Parser.parse!(schedule)]

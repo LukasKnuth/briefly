@@ -38,7 +38,6 @@ defmodule BrieflyWeb.PageController do
   end
 
   defp list_opts(params) do
-    # TODO get timezone from user
     with {:ok, days} <- Map.fetch(params, "days"),
          number when is_integer(number) <- parse_to_days(days) do
       [days_ago: max(0, number)]

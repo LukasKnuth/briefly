@@ -63,7 +63,7 @@ defmodule Briefly do
   **Raises** If the given TimeZone is not supported.
   """
   def list_items(opts) do
-    opts = Keyword.validate!(opts, [:days_ago, :now, timezone: "Etc/UTC"])
+    opts = Keyword.validate!(opts, [:days_ago, :now])
 
     opts
     |> now!()
@@ -76,7 +76,13 @@ defmodule Briefly do
     # NOTE: Timex automatically installs its full Timezone Database
     case Keyword.fetch(opts, :now) do
       {:ok, now} -> now
-      :error -> Keyword.get(opts, :timezone) |> DateTime.now!()
+      :error -> user_timezone() |> DateTime.now!()
     end
+  end
+
+  def user_timezone do
+    :briefly
+    |> Application.fetch_env!(__MODULE__)
+    |> Keyword.fetch!(:timezone)
   end
 end
