@@ -10,9 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Briefly" />
     <link rel="manifest" href="/webapp/site.webmanifest" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
-      <%= assigns[:page_title] || "Briefly" %>
-    </.live_title>
+    <.live_title><%= assigns[:page_title] || "Briefly" %></.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
   </head>
   <body class="bg-white antialiased">
