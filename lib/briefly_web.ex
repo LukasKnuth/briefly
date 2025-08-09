@@ -27,7 +27,6 @@ defmodule BrieflyWeb do
       # Import common connection and controller functions to use in pipelines
       import Plug.Conn
       import Phoenix.Controller
-      import Phoenix.LiveView.Router
     end
   end
 
@@ -47,23 +46,6 @@ defmodule BrieflyWeb do
       import BrieflyWeb.Gettext
 
       unquote(verified_routes())
-    end
-  end
-
-  def live_view do
-    quote do
-      use Phoenix.LiveView,
-        layout: {BrieflyWeb.Layouts, :app}
-
-      unquote(html_helpers())
-    end
-  end
-
-  def live_component do
-    quote do
-      use Phoenix.LiveComponent
-
-      unquote(html_helpers())
     end
   end
 
@@ -87,9 +69,6 @@ defmodule BrieflyWeb do
       # Core UI components and translation
       import BrieflyWeb.CoreComponents
       import BrieflyWeb.Gettext
-
-      # Shortcut for generating JS commands
-      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

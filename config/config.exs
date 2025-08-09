@@ -11,8 +11,7 @@ config :briefly, BrieflyWeb.Endpoint,
     formats: [html: BrieflyWeb.ErrorHTML, json: BrieflyWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Briefly.PubSub,
-  live_view: [signing_salt: "K67JddHK"]
+  pubsub_server: Briefly.PubSub
 
 # Configure esbuild (the version is required)
 config :esbuild,
