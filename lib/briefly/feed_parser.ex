@@ -31,7 +31,6 @@ defmodule Briefly.FeedParser do
   end
 
   def handle_event(:start_element, {"rss", _attr}, nil) do
-    # TODO does RSS version matter?
     {:ok, %__MODULE__{mod: RSS}}
   end
 

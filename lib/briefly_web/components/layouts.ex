@@ -4,7 +4,6 @@ defmodule BrieflyWeb.Layouts do
   embed_templates "layouts/*"
 
   def days_ago do
-    # TODO use translations for theses (and everywhere else...)
     [
       {"today", "Today"},
       {"yesterday", "Yesterday"},
