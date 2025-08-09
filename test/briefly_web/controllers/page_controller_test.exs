@@ -81,6 +81,24 @@ defmodule BrieflyWeb.PageControllerTest do
       end)
     end
 
+    test "renders publish times in specified user timezone", %{conn: conn} do
+      published = DateTime.from_naive!(NaiveDateTime.utc_now(), "America/Los_Angeles")
+      Storage.replace([make_item("itemA1", date: published, group: "News")], [])
+
+      conn
+      |> get(~p"/since/today")
+      |> html_response(200)
+      |> LazyHTML.from_document()
+      |> LazyHTML.query("main .item .publish-time")
+      |> assert_only_one(published, fn element, expected ->
+        local_formatted =
+          Timex.Timezone.convert(expected, Briefly.user_timezone())
+          |> Calendar.strftime("%a, %d of %b at %H:%M")
+
+        LazyHTML.text(element) == local_formatted
+      end)
+    end
+
     test "adds info box if there where problems reading feeds", %{conn: conn} do
       Storage.replace([], [%Problem{reason: "Test", message: "Just a test", url: "https://a.com"}])
 
