@@ -1,5 +1,6 @@
 defmodule BrieflyWeb.Layouts do
   use BrieflyWeb, :html
+  alias Timex.Format.DateTime.Formatters.Relative
 
   embed_templates "layouts/*"
 
@@ -20,6 +21,21 @@ defmodule BrieflyWeb.Layouts do
       0 -> nil
       1 -> "⚠️ 1 problem"
       n -> "⚠️ #{n} problems"
+    end
+  end
+
+  def user_timezone do
+    Briefly.user_timezone()
+  end
+
+  def app_version do
+    Application.spec(:briefly, :vsn)
+  end
+
+  def last_updated do
+    case Briefly.last_updated() do
+      nil -> "Not updated yet"
+      %DateTime{} = dt -> Relative.format!(dt, "{relative}")
     end
   end
 end

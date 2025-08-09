@@ -1,41 +1,56 @@
-<header class="px-4 sm:px-6 lg:px-8 bg-white border-b border-zinc-100 max-w-6xl mx-auto">
-  <div class={
-    [
-      "py-1 sm:py-2 lg:py-4",
-      "grid items-center justify-between grid-cols-8",
-      # Only allocate the column space for the problem box if there are actually problems.
-      is_nil(problem_label()) || "md:grid-cols-10"
-    ]
-  }>
-    <div
-      :if={problem_label()}
-      class="px-2 bg-amber-100 rounded text-center col-span-8 md:col-span-2 order-1 md:order-6"
-    >
-      <a class="problem-indicator" href={~p"/problems"}><%= problem_label() %></a>
+<div class="flex flex-col h-screen">
+  <header class="px-4 sm:px-6 lg:px-8 bg-white border-b border-zinc-100">
+    <div class={
+      [
+        "max-w-6xl mx-auto py-1 sm:py-2 lg:py-4",
+        "grid items-center justify-between grid-cols-8",
+        # Only allocate the column space for the problem box if there are actually problems.
+        is_nil(problem_label()) || "md:grid-cols-10"
+      ]
+    }>
+      <div
+        :if={problem_label()}
+        class="px-2 bg-amber-100 rounded text-center col-span-8 md:col-span-2 order-1 md:order-6"
+      >
+        <a class="problem-indicator" href={~p"/problems"}><%= problem_label() %></a>
+      </div>
+      <div class="font-bold text-xl col-span-1 order-5">
+        <img src="/favicon.svg" width="30px" height="30px" />
+      </div>
+      <nav class="text-sm text-end col-span-7 order-10">
+        <ol class="font-semibold leading-6 text-zinc-900">
+          <li>
+            <a
+              :for={{path, title} <- days_ago()}
+              href={~p[/since/#{path}]}
+              class={[
+                "inline-block",
+                "before:content-['['] before:text-blue-300 before:pl-1",
+                "after:content-[']'] after:text-blue-300 after:pr-1",
+                Map.get(@conn.path_params, "days") == path && "underline underline-offset-8"
+              ]}
+            >
+              <%= title %>
+            </a>
+          </li>
+        </ol>
+      </nav>
     </div>
-    <div class="font-bold text-xl col-span-1 order-5">
-      <img src="/favicon.svg" width="30px" height="30px" />
+  </header>
+  <main class="grow">
+    <div class="max-w-6xl mx-auto"><%= @inner_content %></div>
+  </main>
+  <footer class="py-4 bg-gray-50 border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-2 text-stone-500 flex flex-wrap gap-x-3">
+      <span class="whitespace-nowrap">
+        <span class="font-bold">Version:</span> <%= app_version() %>
+      </span>
+      <span class="whitespace-nowrap">
+        <span class="font-bold">Timezone:</span> <%= user_timezone() %>
+      </span>
+      <span class="whitespace-nowrap">
+        <span class="font-bold">Last updated:</span> <%= last_updated() %>
+      </span>
     </div>
-    <nav class="text-sm text-end col-span-7 order-10">
-      <ol class="font-semibold leading-6 text-zinc-900">
-        <li>
-          <a
-            :for={{path, title} <- days_ago()}
-            href={~p[/since/#{path}]}
-            class={[
-              "inline-block",
-              "before:content-['['] before:text-blue-300 before:pl-1",
-              "after:content-[']'] after:text-blue-300 after:pr-1",
-              Map.get(@conn.path_params, "days") == path && "underline underline-offset-8"
-            ]}
-          >
-            <%= title %>
-          </a>
-        </li>
-      </ol>
-    </nav>
-  </div>
-</header>
-<main class="px-1 sm:px-4 max-w-6xl mx-auto">
-  <%= @inner_content %>
-</main>
+  </footer>
+</div>
