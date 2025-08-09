@@ -12,3 +12,6 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Allow global stubbing of requests sent out by Req
+config :briefly, Briefly.HttpClient, opts: [plug: {Req.Test, Briefly.HttpClientMock}]

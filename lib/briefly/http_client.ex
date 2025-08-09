@@ -16,9 +16,7 @@ defmodule Briefly.HttpClient do
 
   @spec stream_get(url, opts) :: {:ok, Enumerable.t()} | {:error, any()}
   def stream_get(url, opts \\ []) do
-    opts = Keyword.merge(@default_opts, Keyword.take(opts, @accepted_opts))
-
-    case Req.get(url, opts) do
+    case Req.get(url, request_opts(opts)) do
       # NOTE: This is `Req.Response.Async` becasue of `into: :self`!
       {:ok, %Req.Response{status: status, body: body}} when status >= 200 and status < 299 ->
         # Return the streaming body
@@ -30,5 +28,15 @@ defmodule Briefly.HttpClient do
       {:error, exception} ->
         {:error, exception}
     end
+  end
+
+  defp request_opts(overrides) do
+    config =
+      Application.get_env(:briefly, __MODULE__, [])
+      |> Keyword.get(:opts, [])
+
+    @default_opts
+    |> Keyword.merge(config)
+    |> Keyword.merge(Keyword.take(overrides, @accepted_opts))
   end
 end

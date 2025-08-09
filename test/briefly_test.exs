@@ -14,8 +14,8 @@ defmodule BrieflyTest do
 
   describe "refresh/1" do
     test "stores all items on success" do
-      Req.Test.expect(__MODULE__, &respond_fixture(&1, "atom_success.xml"))
-      Req.Test.expect(__MODULE__, &respond_fixture(&1, "rss_success.xml"))
+      Req.Test.expect(Briefly.HttpClientMock, &respond_fixture(&1, "atom_success.xml"))
+      Req.Test.expect(Briefly.HttpClientMock, &respond_fixture(&1, "rss_success.xml"))
 
       assert :ok == Briefly.refresh(mock_opts("config_success.yml"))
       assert Storage.problems() == []
@@ -27,7 +27,7 @@ defmodule BrieflyTest do
     end
 
     test "adds problem if feed can't be parsed" do
-      Req.Test.expect(__MODULE__, 2, fn conn ->
+      Req.Test.expect(Briefly.HttpClientMock, 2, fn conn ->
         case Plug.Conn.request_url(conn) do
           "https://a.test/rss.xml" -> Req.Test.text(conn, "not XML...")
           "https://b.test/atom.xml" -> respond_fixture(conn, "atom_success.xml")
@@ -115,9 +115,7 @@ defmodule BrieflyTest do
   end
 
   defp mock_opts(config_file, opts \\ []) do
-    opts
-    |> Keyword.put_new(:plug, {Req.Test, __MODULE__})
-    |> Keyword.put_new(:path, Path.join(@fixture_path, config_file))
+    Keyword.put_new(opts, :path, Path.join(@fixture_path, config_file))
   end
 
   defp respond_fixture(conn, response_file) do
