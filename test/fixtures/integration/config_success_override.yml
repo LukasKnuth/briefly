@@ -1,0 +1,6 @@
+feeds:
+  - url: https://a.test/rss.xml
+    group: Test
+    feed: Changed
+  - url: https://b.test/atom.xml
+    group: Test

@@ -19,21 +19,20 @@ defmodule Briefly do
         end)
 
       {items, problems} =
-        Enum.reduce(config, {[], []}, fn %Config{url: url, group: group},
-                                         {all_items, all_problems} ->
-          case Map.get(results, url) do
+        Enum.reduce(config, {[], []}, fn config, {all_items, all_problems} ->
+          case Map.get(results, config.url) do
             nil ->
               # coveralls-ignore-next-line
-              problem = Problem.from_feed(url, "not processed")
+              problem = Problem.from_feed(config.url, "not processed")
               {all_items, [problem | all_problems]}
 
             {:ok, items, problems} ->
-              items = Enum.map(items, &Item.add_group(&1, group))
-              problems = Enum.map(problems, &Problem.add_url(&1, url))
+              items = Enum.map(items, &update_item(&1, config))
+              problems = Enum.map(problems, &Problem.add_url(&1, config.url))
               {all_items ++ items, all_problems ++ problems}
 
             {:error, reason} ->
-              problem = Problem.from_feed(url, reason)
+              problem = Problem.from_feed(config.url, reason)
               {all_items, [problem | all_problems]}
           end
         end)
@@ -45,6 +44,12 @@ defmodule Briefly do
         Logger.error("DID fail to read config during feed refresh")
         Storage.replace([], [Problem.from_config(reason)])
     end
+  end
+
+  defp update_item(item, config) do
+    item
+    |> Item.add_group(config.group)
+    |> Item.maybe_override_feed(config.feed)
   end
 
   defdelegate list_problems, to: Storage, as: :problems

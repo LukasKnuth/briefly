@@ -11,11 +11,16 @@ defmodule BrieflyTest do
   setup {Req.Test, :verify_on_exit!}
 
   @fixture_path "test/fixtures/integration/"
+  @cutoff ~U[2023-11-11 12:00:00Z]
 
   describe "refresh/1" do
     test "stores all items on success" do
-      Req.Test.expect(Briefly.HttpClientMock, &respond_fixture(&1, "atom_success.xml"))
-      Req.Test.expect(Briefly.HttpClientMock, &respond_fixture(&1, "rss_success.xml"))
+      Req.Test.expect(Briefly.HttpClientMock, 2, fn conn ->
+        case Plug.Conn.request_url(conn) do
+          "https://a.test/rss.xml" -> respond_fixture(conn, "rss_success.xml")
+          "https://b.test/atom.xml" -> respond_fixture(conn, "atom_success.xml")
+        end
+      end)
 
       assert :ok == Briefly.refresh(mock_opts("config_success.yml"))
       assert Storage.problems() == []
@@ -23,7 +28,24 @@ defmodule BrieflyTest do
       assert [
                %{group: "Test", title: "Atom Entry", feed: "Atom Feed"},
                %{group: "Test", title: "RSS Entry", feed: "RSS Feed"}
-             ] = Storage.items(~U[2023-11-11 12:00:00Z])
+             ] = Storage.items(@cutoff)
+    end
+
+    test "overrides feed name if configured" do
+      Req.Test.expect(Briefly.HttpClientMock, 2, fn conn ->
+        case Plug.Conn.request_url(conn) do
+          "https://a.test/rss.xml" -> respond_fixture(conn, "rss_success.xml")
+          "https://b.test/atom.xml" -> respond_fixture(conn, "atom_success.xml")
+        end
+      end)
+
+      assert :ok == Briefly.refresh(mock_opts("config_success_override.yml"))
+      assert Storage.problems() == []
+
+      assert [
+               %{group: "Test", title: "Atom Entry", feed: "Atom Feed"},
+               %{group: "Test", title: "RSS Entry", feed: "Changed"}
+             ] = Storage.items(@cutoff)
     end
 
     test "adds problem if feed can't be parsed" do
@@ -41,7 +63,7 @@ defmodule BrieflyTest do
 
       assert [
                %{group: "Test", title: "Atom Entry", feed: "Atom Feed"}
-             ] = Storage.items(~U[2023-11-11 12:00:00Z])
+             ] = Storage.items(@cutoff)
     end
 
     test "adds problem if config can't be read" do

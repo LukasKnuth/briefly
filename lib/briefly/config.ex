@@ -10,7 +10,7 @@ defmodule Briefly.Config do
 
   require Logger
 
-  defstruct url: nil, group: nil
+  defstruct url: nil, group: nil, feed: nil
 
   @type path_override :: {:path, binary()}
   @spec load_config([path_override()]) :: {:ok, [%__MODULE__{}]} | {:error, reason :: any()}
@@ -35,7 +35,8 @@ defmodule Briefly.Config do
         %__MODULE__{url: url} |> prepend(acc)
 
       %{"url" => url} = map, acc ->
-        %__MODULE__{url: url, group: Map.get(map, "group")} |> prepend(acc)
+        %__MODULE__{url: url, group: Map.get(map, "group"), feed: Map.get(map, "feed")}
+        |> prepend(acc)
 
       entry, acc ->
         Logger.warning("DID skip malformed config entry", entry: entry)
