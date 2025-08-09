@@ -1,9 +1,9 @@
-defmodule MinimalistReader.MixProject do
+defmodule Briefly.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :minimalist_reader,
+      app: :briefly,
       version: "0.1.0",
       elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -23,7 +23,7 @@ defmodule MinimalistReader.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {MinimalistReader.Application, []},
+      mod: {Briefly.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -74,10 +74,10 @@ defmodule MinimalistReader.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind minimalist_reader", "esbuild minimalist_reader"],
+      "assets.build": ["tailwind briefly", "esbuild briefly"],
       "assets.deploy": [
-        "tailwind minimalist_reader --minify",
-        "esbuild minimalist_reader --minify",
+        "tailwind briefly --minify",
+        "esbuild briefly --minify",
         "phx.digest"
       ]
     ]

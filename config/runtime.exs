@@ -2,13 +2,13 @@ import Config
 require Logger
 
 if System.get_env("PHX_SERVER") do
-  config :minimalist_reader, MinimalistReaderWeb.Endpoint, server: true
+  config :briefly, BrieflyWeb.Endpoint, server: true
 end
 
-config :minimalist_reader, MinimalistReader.Config,
-  file_path: System.get_env("CONFIG_PATH") || "/etc/minimalist_reader/feeds.yml"
+config :briefly, Briefly.Config,
+  file_path: System.get_env("CONFIG_PATH") || "/etc/briefly/feeds.yml"
 
-config :minimalist_reader, MinimalistReaderWeb.PageController,
+config :briefly, BrieflyWeb.PageController,
   home_action: System.get_env("HOME_ACTION") || "today"
 
 refresh_job =
@@ -20,11 +20,11 @@ refresh_job =
       [state: :inactive]
   end
 
-config :minimalist_reader, MinimalistReader.CronScheduler,
+config :briefly, Briefly.CronScheduler,
   overlap: false,
   jobs: [
-    startup: [task: {MinimalistReader, :refresh, []}, schedule: "@reboot"],
-    refresh: [task: {MinimalistReader, :refresh, []}] |> Keyword.merge(refresh_job)
+    startup: [task: {Briefly, :refresh, []}, schedule: "@reboot"],
+    refresh: [task: {Briefly, :refresh, []}] |> Keyword.merge(refresh_job)
   ]
 
 if config_env() == :prod do
@@ -39,7 +39,7 @@ if config_env() == :prod do
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   # TODO do we need a config option for the "url.scheme"?
-  config :minimalist_reader, MinimalistReaderWeb.Endpoint,
+  config :briefly, BrieflyWeb.Endpoint,
     url: [host: host, scheme: "http"],
     http: [
       ip: {0, 0, 0, 0, 0, 0, 0, 0},

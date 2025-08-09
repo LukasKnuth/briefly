@@ -6,7 +6,7 @@ import Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :minimalist_reader, MinimalistReaderWeb.Endpoint,
+config :briefly, BrieflyWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -15,17 +15,17 @@ config :minimalist_reader, MinimalistReaderWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "6U1NzVev0Lo53OVMlMFKyukUD9IXjHdH5tUmsMft6E7sZKn3+yE9OqxDy1WJ+bMi",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:minimalist_reader, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:minimalist_reader, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:briefly, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:briefly, ~w(--watch)]}
   ]
 
 # Watch static and templates for browser reloading.
-config :minimalist_reader, MinimalistReaderWeb.Endpoint,
+config :briefly, BrieflyWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/minimalist_reader_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/briefly_web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
 

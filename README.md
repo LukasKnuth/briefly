@@ -1,4 +1,4 @@
-# MinimalistReader
+# Briefly
 
 To start your Phoenix server:
 

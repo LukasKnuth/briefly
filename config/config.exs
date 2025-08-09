@@ -1,23 +1,23 @@
 import Config
 
-config :minimalist_reader,
+config :briefly,
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :minimalist_reader, MinimalistReaderWeb.Endpoint,
+config :briefly, BrieflyWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: MinimalistReaderWeb.ErrorHTML, json: MinimalistReaderWeb.ErrorJSON],
+    formats: [html: BrieflyWeb.ErrorHTML, json: BrieflyWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: MinimalistReader.PubSub,
+  pubsub_server: Briefly.PubSub,
   live_view: [signing_salt: "K67JddHK"]
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  minimalist_reader: [
+  briefly: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
@@ -27,7 +27,7 @@ config :esbuild,
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "3.4.0",
-  minimalist_reader: [
+  briefly: [
     args: ~w(
       --config=tailwind.config.js
       --input=css/app.css

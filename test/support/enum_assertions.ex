@@ -1,4 +1,4 @@
-defmodule MinimalistReader.EnumAssertions do
+defmodule Briefly.EnumAssertions do
   @moduledoc """
   Module with helpers to assert on enumerables.
   """
