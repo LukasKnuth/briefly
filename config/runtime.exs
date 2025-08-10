@@ -34,12 +34,10 @@ if config_env() == :prod do
       refresh: [task: {Briefly, :refresh, []}] |> Keyword.merge(refresh_job)
     ]
 
-  host = System.get_env("PHX_HOST") || "localhost"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   # TODO do we need a config option for the "url.scheme"?
   config :briefly, BrieflyWeb.Endpoint,
-    url: [host: host, scheme: "http"],
     server: true,
     http: [
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
