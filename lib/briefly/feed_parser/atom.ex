@@ -43,7 +43,9 @@ defmodule Briefly.FeedParser.Atom do
         {:ok, %{state | problems: [problem | state.problems]}}
 
       link when is_binary(link) ->
-        entry = {link, fetch_attribute(attributes, "rel")}
+        rel = fetch_attribute(attributes, "rel")
+        type = fetch_attribute(attributes, "type")
+        entry = {link, rel, type}
         map = Map.update(map, "link", [entry], &[entry | &1])
         {:ok, %{state | partial: map}}
     end
@@ -110,15 +112,26 @@ defmodule Briefly.FeedParser.Atom do
   defp pick_date(%{"updated" => date}), do: {:ok, date}
   defp pick_date(_), do: :error
 
-  defp pick_link([{link, _rel}]), do: {:ok, link}
+  # coveralls-ignore-next-line
+  defp pick_link([]), do: :error
+  defp pick_link([{link, _rel, _type}]), do: {:ok, link}
 
   defp pick_link(links) when is_list(links) do
-    Enum.find_value(links, :error, fn {link, rel} ->
-      if rel == "alternate" || rel == "" || is_nil(rel) do
-        {:ok, link}
-      else
-        false
-      end
+    links
+    |> Enum.max_by(fn {_link, rel, type} ->
+      weighted_score(rel: rel) + weighted_score(type: type)
     end)
+    |> then(fn {link, _rel, _type} -> {:ok, link} end)
   end
+
+  defp weighted_score(rel: rel), do: score_rel(rel) * 0.75
+  defp weighted_score(type: type), do: score_type(type) * 0.25
+
+  defp score_rel(rel) when rel in ["alternate", "", nil], do: 3
+  defp score_rel("self"), do: 2
+  defp score_rel(_rel), do: 1
+
+  defp score_type("text/html"), do: 3
+  defp score_type("text/" <> _rest), do: 2
+  defp score_type(_type), do: 1
 end

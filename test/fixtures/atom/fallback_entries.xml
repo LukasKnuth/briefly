@@ -16,6 +16,7 @@
     <link rel="alternate" type="text/plain" href="http://example.org/2003/12/13/atom03.txt"/>
     <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>
     <link rel="alternate" type="application/json" href="http://example.org/2003/12/13/atom03.json"/>
+    <link rel="self" type="text/markdown" href="http://example.org/2003/12/13/atom03.md"/>
     <published>2003-11-09T17:23:02Z</published>
   </entry>
 </feed>

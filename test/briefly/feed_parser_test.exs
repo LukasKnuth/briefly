@@ -102,17 +102,38 @@ defmodule Briefly.FeedParserTest do
              }
     end
 
-    test "falls back to `rel=alternate` link if non without `rel` are present" do
-      res = FeedParser.parse_stream(load_fixture!("atom/fallback_entries.xml"))
+    for rel <- ["", nil, "alternate"] do
+      test "treats `#{inspect(rel)}` like `alternate`" do
+        links = [
+          {"b", "self", "text/html"},
+          {"a", unquote(rel), "text/plain"}
+        ]
 
-      assert {:ok, [_, item], []} = res
+        assert {:ok, [item], []} = FeedParser.parse_stream(mock_feed(links))
+        assert %Item{link: "a"} = item
+      end
+    end
 
-      assert item == %Item{
-               feed: "Fixture",
-               title: "Multiple Links",
-               link: "http://example.org/2003/12/13/atom03.html",
-               date: ~U[2003-11-09 17:23:02Z]
-             }
+    test "preferrs `rel=alternate` links" do
+      links = [
+        {"script", "self", "text/html"},
+        {"podcast", "alternate", "audio/mp3"},
+        {"shop", "related", "text/html"}
+      ]
+
+      assert {:ok, [item], []} = FeedParser.parse_stream(mock_feed(links))
+      assert %Item{link: "podcast"} = item
+    end
+
+    test "preferrs HTML type over other content types" do
+      links = [
+        {"audio", "alternate", "audio/mp3"},
+        {"data", "alternate", "application/json"},
+        {"article", "alternate", "text/html"}
+      ]
+
+      assert {:ok, [item], []} = FeedParser.parse_stream(mock_feed(links))
+      assert %Item{link: "article"} = item
     end
 
     test "skips entries missing required fields" do
@@ -130,5 +151,29 @@ defmodule Briefly.FeedParserTest do
 
   defp load_fixture!(path) do
     File.stream!(Path.join("test/fixtures", path))
+  end
+
+  defp mock_feed(links) when is_list(links) do
+    link_elements =
+      for {link, rel, type} <- links do
+        Saxy.XML.empty_element("link", href: link, rel: rel, type: type)
+      end
+
+    Saxy.XML.element("feed", [], [
+      Saxy.XML.element("title", [], [Saxy.XML.characters("Mocked Atom Feed")]),
+      Saxy.XML.element(
+        "entry",
+        [],
+        [
+          Saxy.XML.element("title", [], [Saxy.XML.characters("Mocked Atom Entry")]),
+          Saxy.XML.element("published", [], [
+            Saxy.XML.characters(DateTime.to_iso8601(~U[2021-01-12 13:00:12Z]))
+          ])
+        ] ++ link_elements
+      )
+    ])
+    |> Saxy.encode!()
+    # Makes the single line into an Enumerable that can be consumed as a stream.
+    |> List.wrap()
   end
 end
