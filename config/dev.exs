@@ -15,7 +15,6 @@ config :briefly, BrieflyWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "6U1NzVev0Lo53OVMlMFKyukUD9IXjHdH5tUmsMft6E7sZKn3+yE9OqxDy1WJ+bMi",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:briefly, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:briefly, ~w(--watch)]}
   ]
 
