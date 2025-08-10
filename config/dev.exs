@@ -39,6 +39,12 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 # ----- APPLICATION SPECIFIC CONFIG --------
+config :briefly, Briefly.HttpClient,
+  opts: [
+    connect_options: [timeout: 120_000],
+    receive_timeout: 60_000
+  ]
+
 config :briefly, Briefly, timezone: "Europe/Berlin"
 config :briefly, Briefly.Config, file_path: "test_feeds.yml"
 config :briefly, BrieflyWeb.PageController, home_action: "yesterday"
