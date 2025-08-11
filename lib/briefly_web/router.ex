@@ -14,6 +14,8 @@ defmodule BrieflyWeb.Router do
   scope "/", BrieflyWeb do
     pipe_through :browser
 
+    get "/health", PageController, :health
+
     get "/", PageController, :home
     get "/since/:days", PageController, :feed
 

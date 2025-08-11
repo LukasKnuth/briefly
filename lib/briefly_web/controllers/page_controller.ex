@@ -1,6 +1,13 @@
 defmodule BrieflyWeb.PageController do
   use BrieflyWeb, :controller
 
+  @doc "A simple health/readiness check Endpoint"
+  def health(conn, _params) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> resp(200, "OK")
+  end
+
   @doc "A configurable start view for the feed"
   def home(conn, _params) do
     path_params =

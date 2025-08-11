@@ -210,6 +210,13 @@ defmodule BrieflyWeb.PageControllerTest do
     end
   end
 
+  describe "GET /health" do
+    test "returns 200 and `OK` if the server is running", %{conn: conn} do
+      conn = get(conn, ~p"/health")
+      assert text_response(conn, 200) == "OK"
+    end
+  end
+
   defp make_item(id, opts) do
     %Item{
       link: id,
