@@ -43,6 +43,7 @@ defmodule Briefly.Models.Problem do
   defp as_text(reason) when is_binary(reason), do: reason
   defp as_text(reason) when is_exception(reason), do: Exception.message(reason)
   defp as_text(reason) when is_atom(reason), do: to_string(reason)
+  # coveralls-ignore-next-line
   defp as_text(reason), do: inspect(reason)
 
   def message(%__MODULE__{url: url, reason: reason, message: message}) do
