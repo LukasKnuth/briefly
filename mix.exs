@@ -4,7 +4,7 @@ defmodule Briefly.MixProject do
   def project do
     [
       app: :briefly,
-      version: "0.1.0",
+      version: version(),
       elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -16,6 +16,10 @@ defmodule Briefly.MixProject do
         "coveralls.html": :test
       ]
     ]
+  end
+
+  def version do
+    System.get_env("APP_VERSION", "0.0.0-local")
   end
 
   # Configuration for the OTP application.
