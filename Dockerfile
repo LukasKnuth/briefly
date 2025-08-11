@@ -89,5 +89,5 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/briefly ./
 
 USER nobody
 
-ENTRYPOINT ["/tini", "--"]
+ENTRYPOINT ["tini", "--"]
 CMD ["/app/bin/server"]
