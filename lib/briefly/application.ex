@@ -5,16 +5,27 @@ defmodule Briefly.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      Briefly.Storage,
-      {Task.Supervisor, name: Briefly.TaskSupervisor},
-      {Phoenix.PubSub, name: Briefly.PubSub},
-      BrieflyWeb.Endpoint,
-      Briefly.CronScheduler
-    ]
+    with :ok <- validate_timezone_config() do
+      children = [
+        Briefly.Storage,
+        {Task.Supervisor, name: Briefly.TaskSupervisor},
+        {Phoenix.PubSub, name: Briefly.PubSub},
+        BrieflyWeb.Endpoint,
+        Briefly.CronScheduler
+      ]
 
-    opts = [strategy: :one_for_one, name: Briefly.Supervisor]
-    Supervisor.start_link(children, opts)
+      opts = [strategy: :one_for_one, name: Briefly.Supervisor]
+      Supervisor.start_link(children, opts)
+    end
+  end
+
+  defp validate_timezone_config do
+    timezone = Briefly.user_timezone()
+
+    case Timex.is_valid_timezone?(timezone) do
+      true -> :ok
+      false -> {:error, "Configured timezone '#{timezone}' is invalid"}
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration

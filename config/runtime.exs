@@ -10,12 +10,6 @@ if config_env() == :prod do
 
   timezone = System.get_env("TZ") || "Etc/UTC"
 
-  unless Timex.is_valid_timezone?(timezone) do
-    raise """
-    The timezone specified in the TZ environment variable is invalid.
-    """
-  end
-
   config :briefly, Briefly, timezone: timezone
 
   refresh_job =
