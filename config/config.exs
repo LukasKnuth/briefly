@@ -13,11 +13,6 @@ config :briefly, BrieflyWeb.Endpoint,
   ],
   pubsub_server: Briefly.PubSub
 
-# Configure esbuild (the version is required)
-config :esbuild,
-  version: "0.17.11",
-  briefly: []
-
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "3.4.0",

@@ -48,7 +48,6 @@ defmodule Briefly.MixProject do
       {:phoenix_live_view, "~> 0.20.2"},
       {:lazy_html, "~> 0.1.3", only: :test},
       # Assets
-      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       # Feed parsing
       {:saxy, "~> 1.6"},
@@ -73,11 +72,10 @@ defmodule Briefly.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind briefly", "esbuild briefly"],
+      "assets.setup": ["tailwind.install --if-missing"],
+      "assets.build": ["tailwind briefly"],
       "assets.deploy": [
         "tailwind briefly --minify",
-        "esbuild briefly --minify",
         "phx.digest"
       ]
     ]
