@@ -26,7 +26,7 @@ You can of course also add feeds from larger outlets - but those are rarely calm
 
 ## Configuration and Hosting
 
-A Docker image is available at `ghcr.io/lukasknuth/briefly` via [GitHub Packages]().
+A Docker image is available at `ghcr.io/lukasknuth/briefly` via [GitHub Packages](https://github.com/LukasKnuth/briefly/pkgs/container/briefly).
 Here is an example `docker-compose.yml` file - all options are explained below.
 
 ```yml
@@ -48,11 +48,11 @@ services:
 
 | Name | Description | Default |
 |------|-------------|---------|
-| `TZ` | The Timezone that all times should be display as. | `Etc/UTC` |
+| `TZ` | The [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) that all times should be display in. | `Etc/UTC` |
 | `CONFIG_PATH` | Path to the YAML configuration file (see below). | `/etc/briefly/feeds.yml` |
 | `HOME_ACTION` | Action that the `/` root route should render. This is the same as the parameter given to the `/since/:days` route! | `yesterday` |
-| `CRON_REFRESH` | Frequency at which the feeds are refreshed, in [CRON notation](https://crontab.guru/) | unset; disables automatic refresh |
-| `PORT` | Which port should the HTTP server listen on | `4000` |
+| `CRON_REFRESH` | Frequency at which the feeds are refreshed, using [CRON notation](https://crontab.guru/) | unset; disables automatic refresh! |
+| `PORT` | Port that the HTTP server listens on. | `4000` |
 
 ### Configuration File
 
@@ -70,11 +70,11 @@ feeds:
 ```
 
 The root is an object with a single `feeds` array.
-In the array, items can have the following properties:
+In the array, entries can have the following properties:
 
 | Property | Description | Default |
 |----------|-------------|---------|
-| `url` (sting) | Direct URL to the RSS/Atom feed. | No default; Required |
+| `url` (string) | Direct URL to the RSS/Atom feed. | No default; Required |
 | `group` (string) | Group that this feed belongs to | `null` meaning "no group" |
 | `feed` (string) | Overrides the feeds name on each item | The feeds `title` from RSS/Atom |
 
@@ -82,3 +82,8 @@ Notes:
 
 - If multiple feeds have the same `group` value, their items will be listed in the same group.
 - When only `url` is specified, the object can be replaced by just a string (see example above).
+
+## Shoutouts
+
+This is heavily inspired by [the web-reader project by @capjamesg](https://github.com/capjamesg/web-reader).
+This is basically a more integrated and easier to run version of this project.
