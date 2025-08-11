@@ -1,7 +1,8 @@
 name: Check
 
 on:
-  push
+  push:
+    branches: ['**']
 
 jobs:
   check:
