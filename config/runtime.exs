@@ -30,7 +30,6 @@ if config_env() == :prod do
 
   port = String.to_integer(System.get_env("PORT") || "4000")
 
-  # TODO do we need a config option for the "url.scheme"?
   config :briefly, BrieflyWeb.Endpoint,
     server: true,
     http: [
