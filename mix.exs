@@ -19,6 +19,8 @@ defmodule Briefly.MixProject do
   end
 
   def version do
+    # NOTE: This value is read at compile-time! In releases (like when building the
+    # Docker Image), this means the ENV variable might not exist after building it.
     System.get_env("APP_VERSION", "0.0.0-local")
   end
 
