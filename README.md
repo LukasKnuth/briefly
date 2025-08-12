@@ -82,6 +82,7 @@ Notes:
 
 - If multiple feeds have the same `group` value, their items will be listed in the same group.
 - When only `url` is specified, the object can be replaced by just a string (see example above).
+- If the URL contains UTF8 characters, it must be [Punycode encoded](https://en.wikipedia.org/wiki/Punycode)
 
 ## Shoutouts
 
