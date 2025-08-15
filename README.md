@@ -50,10 +50,10 @@ services:
 
 | Name | Description | Default |
 |------|-------------|---------|
-| `TZ` | The [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) that all times should be display in. | `Etc/UTC` |
+| `TZ` | [Timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for displayed times and CRON refresh. | `Etc/UTC` |
+| `CRON_REFRESH` | When to update feeds, in [CRON notation](https://crontab.guru/) - uses `TZ` timezone! | unset; **disables automatic refresh!** |
 | `CONFIG_PATH` | Path to the YAML configuration file (see below). | `/etc/briefly/feeds.yml` |
 | `HOME_ACTION` | Action that the `/` root route should render. This is the same as the parameter given to the `/since/:days` route! | `yesterday` |
-| `CRON_REFRESH` | Frequency at which the feeds are refreshed, using [CRON notation](https://crontab.guru/) | unset; disables automatic refresh! |
 | `PORT` | Port that the HTTP server listens on. | `4000` |
 
 ### Configuration File

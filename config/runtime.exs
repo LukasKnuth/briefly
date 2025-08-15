@@ -9,7 +9,7 @@ if config_env() == :prod do
     home_action: System.get_env("HOME_ACTION") || "yesterday"
 
   timezone = System.get_env("TZ") || "Etc/UTC"
-
+  # NOTE: this is validated in `Briefly.Application` before launch!
   config :briefly, Briefly, timezone: timezone
 
   refresh_job =
@@ -23,6 +23,7 @@ if config_env() == :prod do
 
   config :briefly, Briefly.CronScheduler,
     overlap: false,
+    timezone: timezone,
     jobs: [
       startup: [task: {Briefly, :refresh, []}, schedule: "@reboot"],
       refresh: [task: {Briefly, :refresh, []}] |> Keyword.merge(refresh_job)
