@@ -1,4 +1,5 @@
-# Briefly
+# Briefly ![GitHub Tag](https://img.shields.io/github/v/tag/LukasKnuth/briefly)
+ ![GitHub License](https://img.shields.io/github/license/LukasKnuth/briefly) 
 
 A minimalist Atom/RSS reader that aims to be _calm_.
 To achieve this, a few explicit design decisions where made:
