@@ -1,5 +1,4 @@
-# Briefly ![GitHub Tag](https://img.shields.io/github/v/tag/LukasKnuth/briefly)
- ![GitHub License](https://img.shields.io/github/license/LukasKnuth/briefly) 
+# Briefly ![GitHub Tag](https://img.shields.io/github/v/tag/LukasKnuth/briefly?label=latest)
 
 A minimalist Atom/RSS reader that aims to be _calm_.
 To achieve this, a few explicit design decisions where made:
@@ -22,8 +21,10 @@ You can of course also add feeds from larger outlets - but those are rarely calm
 ## Features
 
 - Supports RSS and Atom type feeds
-- Simple to host - just one Docker image, no database
+- Simple code
+- Easy to host - just one Docker image, no database
 - Well tested code [![Coverage Status](https://coveralls.io/repos/github/LukasKnuth/briefly/badge.svg?branch=main)](https://coveralls.io/github/LukasKnuth/briefly?branch=main)
+- Free as in Freedom ![GitHub License](https://img.shields.io/github/license/LukasKnuth/briefly)
 
 ## Configuration and Hosting
 
