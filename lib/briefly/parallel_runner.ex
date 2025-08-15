@@ -4,7 +4,9 @@ defmodule Briefly.ParallelRunner do
   """
   alias Briefly.FeedParser
 
-  @default_opts [{:timeout, :timer.seconds(2)}]
+  # NOTE: This is a hard upper-bound, enforced for task workflows. Ideally, tasks itself
+  # enforce more grenular timeouts on their own.
+  @default_opts [{:timeout, :timer.minutes(5)}]
 
   @type url :: binary()
   @spec load_all([url], (url -> any())) :: %{
