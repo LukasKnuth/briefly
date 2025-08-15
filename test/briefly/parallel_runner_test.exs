@@ -1,5 +1,6 @@
 defmodule Briefly.ParallelRunnerTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureLog, only: [with_log: 1]
 
   alias Briefly.ParallelRunner
 
@@ -10,13 +11,16 @@ defmodule Briefly.ParallelRunnerTest do
     end
 
     test "captures an exception and returns it" do
-      assert %{"works" => {:ok, :yay}, "raise" => {:error, %IO.StreamError{}}} ==
-               ParallelRunner.load_all(["raise", "works"], &mock/1)
+      {result, log} =
+        with_log(fn -> ParallelRunner.load_all(["raise", "works"], &mock/1) end)
+
+      assert %{"works" => {:ok, :yay}, "raise" => {:error, %IO.StreamError{}}} == result
+      assert log =~ ~r/RESCUED error in Task.*(IO.StreamError)/
     end
 
     test "captures a timeout and returns it" do
       assert %{"works" => {:ok, :yay}, "timeout" => {:error, :timeout}} ==
-               ParallelRunner.load_all(["works", "timeout"], &mock/1, [timeout: 50])
+               ParallelRunner.load_all(["works", "timeout"], &mock/1, timeout: 50)
     end
   end
 

@@ -3,6 +3,7 @@ defmodule Briefly.ParallelRunner do
   A multithreaded loader component to fetch multiple feeds.
   """
   alias Briefly.FeedParser
+  require Logger
 
   # NOTE: This is a hard upper-bound, enforced for task workflows. Ideally, tasks itself
   # enforce more grenular timeouts on their own.
@@ -37,6 +38,8 @@ defmodule Briefly.ParallelRunner do
     result = fun.(url)
     {url, result}
   rescue
-    error -> {url, {:error, error}}
+    error ->
+      Logger.error("RESCUED error in Task: #{Exception.format(:error, error)}")
+      {url, {:error, error}}
   end
 end
