@@ -40,5 +40,9 @@ jobs:
           platforms: ${{ env.PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Sets the app-version to the Elixir compiler, see mix.exs
           build-args: |
             APP_VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+          # Cache the image creation via GitHub Actions Cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
