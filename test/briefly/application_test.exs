@@ -1,5 +1,5 @@
 defmodule Briefly.ApplicationTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   describe "start/2" do
     setup do
