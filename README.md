@@ -51,9 +51,9 @@ services:
 | Name | Description | Default |
 |------|-------------|---------|
 | `TZ` | [Timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for displayed times and CRON refresh. | `Etc/UTC` |
-| `CRON_REFRESH` | When to update feeds, in [CRON notation](https://crontab.guru/) - uses `TZ` timezone! | unset; **disables automatic refresh!** |
-| `CONFIG_PATH` | Path to the YAML configuration file (see below). | `/etc/briefly/feeds.yml` |
+| `CRON_REFRESH` | When to update feeds, in [CRON notation](https://crontab.guru/) - uses `TZ` timezone! | unset; **auto refresh disabled!** |
 | `HOME_ACTION` | Action that the `/` root route should render. This is the same as the parameter given to the `/since/:days` route! | `yesterday` |
+| `CONFIG_PATH` | Path to the YAML configuration file (see below). | `/etc/briefly/feeds.yml` |
 | `PORT` | Port that the HTTP server listens on. | `4000` |
 
 ### Configuration File
@@ -76,14 +76,14 @@ In the array, entries can have the following properties:
 
 | Property | Description | Default |
 |----------|-------------|---------|
-| `url` (string) | Direct URL to the RSS/Atom feed. | No default; Required |
+| `url` (string) | Direct URL to the RSS/Atom feed. | No default; **Required** |
 | `group` (string) | Group that this feed belongs to | `null` meaning "no group" |
 | `feed` (string) | Overrides the feeds name on each item | The feeds `title` from RSS/Atom |
 
 Notes:
 
 - If multiple feeds have the same `group` value, their items will be listed in the same group.
-- When only `url` is specified, the object can be replaced by just a string (see example above).
+- When only `url` is needed, the object can be replaced by just a string (see example above).
 - If the URL contains UTF8 characters, it must be [Punycode encoded](https://en.wikipedia.org/wiki/Punycode)
 
 ## Shoutouts
