@@ -15,8 +15,9 @@ defmodule BrieflyWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :briefly,
-    gzip: false,
-    only: BrieflyWeb.static_paths()
+    gzip: not code_reloading?,
+    only: BrieflyWeb.static_paths(),
+    raise_on_missing_only: code_reloading?
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

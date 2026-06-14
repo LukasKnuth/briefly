@@ -29,12 +29,10 @@ if config_env() == :prod do
       refresh: [task: {Briefly, :refresh, []}] |> Keyword.merge(refresh_job)
     ]
 
-  port = String.to_integer(System.get_env("PORT") || "4000")
-
   config :briefly, BrieflyWeb.Endpoint,
     server: true,
     http: [
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: port
+      port: String.to_integer(System.get_env("PORT", "4000"))
     ]
 end

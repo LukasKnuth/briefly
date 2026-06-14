@@ -1,5 +1,6 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss" source(none);
+
+/* Files to find tailwind class names in */
+@source "../../lib/briefly_web";
 
 /* This file is for your main application CSS */

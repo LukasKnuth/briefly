@@ -22,9 +22,10 @@ config :briefly, BrieflyWeb.Endpoint,
 config :briefly, BrieflyWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"priv/gettext/.*(po)$",
-      ~r"lib/briefly_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"priv/static/(?!uploads/).*\.(js|css|png|jpeg|jpg|gif|svg)$"E,
+      ~r"priv/gettext/.*\.po$"E,
+      ~r"lib/sample_app_web/router\.ex$"E,
+      ~r"lib/briefly_web/(controllers|components)/.*\.(ex|eex)$"E
     ]
   ]
 

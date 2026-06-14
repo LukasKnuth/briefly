@@ -10,7 +10,8 @@ defmodule Briefly.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      test_coverage: [tool: ExCoveralls]
+      test_coverage: [tool: ExCoveralls],
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
@@ -44,7 +45,7 @@ defmodule Briefly.MixProject do
   defp deps do
     [
       # Web Framework
-      {:phoenix, "~> 1.7.11"},
+      {:phoenix, "~> 1.8.8"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:jason, "~> 1.2"},
