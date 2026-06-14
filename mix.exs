@@ -50,8 +50,7 @@ defmodule Briefly.MixProject do
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.2"},
       {:gettext, "~> 0.20"},
-      # LiveView
-      {:phoenix_live_view, "~> 0.20.2"},
+      # Web end2end test
       {:lazy_html, "~> 0.1.3", only: :test},
       # Assets
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},

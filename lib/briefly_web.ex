@@ -51,27 +51,20 @@ defmodule BrieflyWeb do
 
   def html do
     quote do
-      use Phoenix.Component
+      # HTML escaping functionality
+      import Phoenix.HTML
+      import Phoenix.HTML.Form
+      # Translation
+      import BrieflyWeb.Gettext
+      # Template helpers
+      import Phoenix.Template, only: [embed_templates: 1]
+
+      # Routes generation with the ~p sigil
+      unquote(verified_routes())
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
         only: [get_csrf_token: 0, view_module: 1, view_template: 1]
-
-      # Include general helpers for rendering HTML
-      unquote(html_helpers())
-    end
-  end
-
-  defp html_helpers do
-    quote do
-      # HTML escaping functionality
-      import Phoenix.HTML
-      # Core UI components and translation
-      import BrieflyWeb.CoreComponents
-      import BrieflyWeb.Gettext
-
-      # Routes generation with the ~p sigil
-      unquote(verified_routes())
     end
   end
 

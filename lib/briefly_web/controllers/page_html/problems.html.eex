@@ -7,17 +7,21 @@
       Problems encountered while loading or parsing the configured feeds.
     </p>
     <ul>
-      <li :for={{p, i} <- Enum.with_index(@problems, 1)} class="problem py-2">
+      <%= for {p, i} <- Enum.with_index(@problems, 1) do %>
+      <li class="problem py-2">
         <div>
           <span class="index"><%= i %>.</span>
           <span class="reason font-bold"><%= p.reason %>:</span>
           <span class="message"><%= p.message %></span>
         </div>
-        <div :if={p.url} class="text-gray-400">
+        <%= if p.url do %>
+        <div class="text-gray-400">
           <span>URL:</span>
           <span><code class="url"><%= p.url %></code></span>
         </div>
+        <% end %>
       </li>
+      <% end %>
     </ul>
   <% end %>
 </div>
