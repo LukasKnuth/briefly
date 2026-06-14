@@ -9,7 +9,7 @@ defmodule BrieflyWeb.PageController do
   end
 
   @doc "A configurable start view for the feed"
-  def home(conn, _params) do
+  def home(%Plug.Conn{} = conn, _params) do
     path_params =
       :briefly
       |> Application.fetch_env!(__MODULE__)

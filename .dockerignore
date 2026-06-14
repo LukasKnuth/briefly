@@ -47,6 +47,6 @@ erl_crash.dump
 # Local development files
 .envrc
 .formatter.exs
-.tool-versions
+mise.toml
 coveralls.json
 test_feeds.yml

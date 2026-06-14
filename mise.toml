@@ -1,0 +1,4 @@
+[tools]
+elixir = "1.20.1-otp-29"
+elixir-ls = "latest"
+erlang = "29.0.2"
